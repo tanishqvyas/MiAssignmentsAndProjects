@@ -1,6 +1,6 @@
 ## MI UE18CS303 Assignments & Projects
 
-*Folder Structure*
+_Folder Structure_
 
 ```
 +
@@ -10,5 +10,10 @@
 |--- Project
 |
 |--- Readme.md
+|
+|--- requirements.txt
 +
+
 ```
+
+
