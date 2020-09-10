@@ -8,6 +8,7 @@ def test_case():
     size of heuristic list is 11
     0th index is always 0'''
 
+
     cost = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
             [0, 0, 5, 9, -1, 6, -1, -1, -1, -1, -1],
             [0, -1, 0, 3, -1, -1, 9, -1, -1, -1, -1], 
@@ -44,6 +45,8 @@ def test_case():
             print("SAMPLE TEST CASE 3 FOR THE  A_star_TRAVERSAL FAILED")
     except:
         print("SAMPLE TEST CASE 3 FOR THE A_star_TRAVERSAL FAILED")
+
+
 
 
 test_case()
