@@ -1,3 +1,47 @@
+class PriorityQueue:
+
+
+    def __init__(self):
+        self.pqueue = []
+        self.length = 0
+
+
+    def isQueueEmpty(self):
+
+        if(self.length > 0):
+            False
+        else:
+            True
+
+    def insert(self, value, priority):
+
+        if(self.length == 0):
+            self.pqueue.append([value, priority])
+        
+        else:
+            for i in range(len(self.pqueue)):
+
+                if(self.pqueue[i][1] < priority):
+                    self.pqueue.insert([value, priority], i)
+
+        self.length += 1
+        
+    def delete(self):
+        pass
+
+    def display(self, showPriority = False):
+
+        if(showPriority):
+            for i in range(self.length):
+                print("Value : ", self.pqueue[i][0], " Priority : ", self.pqueue[i][1])
+        
+        else:
+            for i in range(self.length):
+                print(self.pqueue[i][0], end=" ")
+
+        print()     
+
+
 
 def DFS_Traversal(meta_data, start_point, goals, cost):
     # Initializing the path list
@@ -34,7 +78,7 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
         for adjacent_node in range(1, meta_data["node_count"]+1):
             if(not visited[adjacent_node] and cost[node][adjacent_node] != -1):
                 holder_stack.append(adjacent_node)
-                break
+                break   
 
     return path
 
