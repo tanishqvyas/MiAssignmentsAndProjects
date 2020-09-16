@@ -23,7 +23,14 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
             path.append(node)
 
             visited[node] = True
+            if(node in goals):
+                isPathFound = True
 
+        # Checking if the new node is goal node or not
+        if(isPathFound):
+            break
+
+        # Exploring adjacent nodes
         for adjacent_node in range(1, meta_data["node_count"]+1):
             if(not visited[adjacent_node] and cost[node][adjacent_node] != -1):
                 holder_stack.append(adjacent_node)
