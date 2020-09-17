@@ -1,5 +1,9 @@
 class PriorityQueue:
 
+    '''
+    Insertion at the beginning of list
+    Deletion from the back
+    '''
 
     def __init__(self):
         self.pqueue = []
@@ -21,13 +25,20 @@ class PriorityQueue:
         else:
             for i in range(len(self.pqueue)):
 
-                if(self.pqueue[i][1] < priority):
-                    self.pqueue.insert([value, priority], i)
+                if(self.pqueue[i][1] <= priority):
+                    self.pqueue.insert(i, [value, priority])
+                    break
 
         self.length += 1
         
     def delete(self):
-        pass
+        
+        if(self.length > 0):
+
+            self.pqueue.pop(-1)
+
+            self.length -= 1
+
 
     def display(self, showPriority = False):
 
@@ -136,3 +147,29 @@ def tri_traversal(cost, heuristic, start_point, goals):
     l.append(t3)
 
     return l
+
+
+if __name__ == '__main__':
+    
+    obj = PriorityQueue()
+
+    obj.insert("u", 1)
+    obj.display()
+    obj.insert("o", 2)
+    obj.display()
+    obj.insert("i", 3)
+    obj.display()
+    obj.insert("e", 4)
+    obj.display()
+    obj.insert("a", 5)
+    obj.display()
+    obj.delete()
+    obj.display()
+    obj.delete()
+    obj.display()
+    obj.delete()
+    obj.display()
+    obj.delete()
+    obj.display()
+    obj.delete()
+    obj.display()
