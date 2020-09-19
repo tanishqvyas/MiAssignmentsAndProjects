@@ -1,3 +1,7 @@
+import copy
+import time
+
+
 class PriorityQueue:
 
     '''
@@ -42,15 +46,18 @@ class PriorityQueue:
 
     def display(self, showPriority = False):
 
-        if(showPriority):
-            for i in range(self.length):
-                print("Value : ", self.pqueue[i][0], " Priority : ", self.pqueue[i][1])
+        # if(showPriority):
+        #     for i in range(self.length):
+        #         print("cur idx : ", i)
+        #         print("Value : ", self.pqueue[i][0], " Priority : ", self.pqueue[i][1])
         
-        else:
-            for i in range(self.length):
-                print(self.pqueue[i][0], end=" ")
+        # else:
+        #     for i in range(self.length):
+        #         print(self.pqueue[i][0], end=" ")
 
-        print()     
+        # print()     
+        print("Len : ", self.length)
+        print("Q : ", self.pqueue)
 
 
 
@@ -94,10 +101,56 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
     return path
 
 
-def UCS_Traversal(meta_data, start_point, goals, cost, heuristic):
-    path = []
+def UCS_Traversal(meta_data, start_point, goals, cost):
+    
+    # Initialize an empty priority queue
+    PriorityQ = PriorityQueue()
 
-    return path
+    ans_path = []
+
+    # Insert root into queue
+    PriorityQ.insert([start_point], 0)
+
+    while not PriorityQ.isQueueEmpty():
+        
+        print("while loop begins------------------------------")
+        PriorityQ.display(showPriority=True)
+        time.sleep(1)
+
+        # Dequeue Max Priority element : Which will be the last element in queue with least cost
+        path = PriorityQ.pqueue[-1][0]
+        priority = PriorityQ.pqueue[-1][1]
+        PriorityQ.delete()
+
+        print("Cur path under eval : ", path)
+
+        if(path[-1] in goals):
+            ans_path = path
+            break
+
+        else:
+
+            # This is the noder to which path has least cost
+            ele_to_expand = path[-1]
+
+            # Find all children and add their paths in PQueue
+            for i in range(1, meta_data["node_count"]+1):
+
+                if(cost[ele_to_expand][i] != -1):
+
+                    path_to_add = copy.deepcopy(path)
+                    path_to_add.append(i)
+                    updated_priority = priority + cost[ele_to_expand][i]
+
+                    if(updated_priority > 0 and (i not in path)):
+                        PriorityQ.insert(path_to_add, updated_priority)
+
+        PriorityQ.display(showPriority=True)
+        print("While loop ends----------------------\n\n")
+        time.sleep(1)
+
+    return ans_path
+
 
 def A_star_Traversal(meta_data, start_point, goals, cost, heuristic):
     path = []
@@ -139,7 +192,7 @@ def tri_traversal(cost, heuristic, start_point, goals):
     meta_data["node_count"] = len(cost) - 1
 
     t1 = DFS_Traversal(meta_data, start_point, goals, cost)
-    t2 = UCS_Traversal(meta_data, start_point, goals, cost, heuristic)
+    t2 = UCS_Traversal(meta_data, start_point, goals, cost)
     t3 = A_star_Traversal(meta_data, start_point, goals, cost, heuristic)
 
     l.append(t1)
@@ -161,7 +214,7 @@ if __name__ == '__main__':
     obj.display()
     obj.insert("e", 4)
     obj.display()
-    obj.insert("a", 5)
+    obj.insert("a", 4)
     obj.display()
     obj.delete()
     obj.display()
