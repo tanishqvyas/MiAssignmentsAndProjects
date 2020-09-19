@@ -23,17 +23,27 @@ class PriorityQueue:
 
     def insert(self, value, priority):
 
+        didInsert = False
+
         if(self.length == 0):
             self.pqueue.append([value, priority])
+            self.length += 1
+            didInsert = True
         
         else:
             for i in range(len(self.pqueue)):
 
                 if(self.pqueue[i][1] <= priority):
                     self.pqueue.insert(i, [value, priority])
+                    self.length += 1
+                    didInsert = True
                     break
-
-        self.length += 1
+            
+            if(didInsert == False):
+                self.pqueue.append([value, priority])
+                self.length += 1
+                didInsert = True
+        
         
     def delete(self):
         
@@ -113,16 +123,16 @@ def UCS_Traversal(meta_data, start_point, goals, cost):
 
     while not PriorityQ.isQueueEmpty():
         
-        print("while loop begins------------------------------")
-        PriorityQ.display(showPriority=True)
-        time.sleep(1)
+        # print("while loop begins------------------------------")
+        # PriorityQ.display(showPriority=True)
+        # time.sleep(1)
 
         # Dequeue Max Priority element : Which will be the last element in queue with least cost
         path = PriorityQ.pqueue[-1][0]
         priority = PriorityQ.pqueue[-1][1]
         PriorityQ.delete()
 
-        print("Cur path under eval : ", path)
+        # print("Cur path under eval : ", path)
 
         if(path[-1] in goals):
             ans_path = path
@@ -142,21 +152,66 @@ def UCS_Traversal(meta_data, start_point, goals, cost):
                     path_to_add.append(i)
                     updated_priority = priority + cost[ele_to_expand][i]
 
-                    if(updated_priority > 0 and (i not in path)):
+                    if(i not in path):
                         PriorityQ.insert(path_to_add, updated_priority)
 
-        PriorityQ.display(showPriority=True)
-        print("While loop ends----------------------\n\n")
-        time.sleep(1)
+        # PriorityQ.display(showPriority=True)
+        # print("While loop ends----------------------\n\n")
+        # time.sleep(1)
 
     return ans_path
 
 
 def A_star_Traversal(meta_data, start_point, goals, cost, heuristic):
-    path = []
+    
+    # Initialize an empty priority queue
+    PriorityQ = PriorityQueue()
 
-    return path
+    ans_path = []
 
+    # Insert root into queue
+    PriorityQ.insert([start_point], heuristic[start_point])
+
+    while not PriorityQ.isQueueEmpty():
+        
+        # print("while loop begins------------------------------")
+        # PriorityQ.display(showPriority=True)
+        # time.sleep(1)
+
+        # Dequeue Max Priority element : Which will be the last element in queue with least cost
+        path = PriorityQ.pqueue[-1][0]
+        priority = PriorityQ.pqueue[-1][1]
+        PriorityQ.delete()
+
+        # print("Cur path under eval : ", path)
+        # print("Priori of cur path : ", priority)
+
+        if(path[-1] in goals):
+            ans_path = path
+            break
+
+        else:
+
+            # This is the noder to which path has least cost
+            ele_to_expand = path[-1]
+
+            # Find all children and add their paths in PQueue
+            for i in range(1, meta_data["node_count"]+1):
+
+                if(cost[ele_to_expand][i] != -1):
+
+                    path_to_add = copy.deepcopy(path)
+                    path_to_add.append(i)
+                    updated_priority = priority + cost[ele_to_expand][i] + heuristic[i] - heuristic[ele_to_expand]
+
+                    if(i not in path):
+                        PriorityQ.insert(path_to_add, updated_priority)
+
+        # PriorityQ.display(showPriority=True)
+        # print("While loop ends----------------------\n\n")
+        # time.sleep(1)
+
+    return ans_path
 
 '''
 Function tri_traversal - performs DFS, UCS and A* traversals and returns the path for each of these traversals 
