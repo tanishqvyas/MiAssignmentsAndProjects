@@ -114,6 +114,7 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
             if(node in goals):
                 isPathFound = True
 
+
         # Checking if the new node is goal node or not
         if(isPathFound):
             break
@@ -123,9 +124,8 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
             if(not visited[adjacent_node] and cost[node][adjacent_node] != -1):
                 holder_stack.append(adjacent_node)
                 
-
+                
     return path
-
 
 
 
@@ -265,6 +265,7 @@ def tri_traversal(cost, heuristic, start_point, goals):
 
     meta_data["node_count"] = len(cost) - 1
 
+
     t1 = DFS_Traversal(meta_data, start_point, goals, cost)
     t2 = UCS_Traversal(meta_data, start_point, goals, cost)
     t3 = A_star_Traversal(meta_data, start_point, goals, cost, heuristic)
@@ -274,29 +275,3 @@ def tri_traversal(cost, heuristic, start_point, goals):
     l.append(t3)
 
     return l
-
-
-if __name__ == '__main__':
-    
-    obj = PriorityQueue()
-
-    obj.insert("u", 1)
-    obj.display()
-    obj.insert("o", 2)
-    obj.display()
-    obj.insert("i", 3)
-    obj.display()
-    obj.insert("e", 4)
-    obj.display()
-    obj.insert("a", 4)
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
