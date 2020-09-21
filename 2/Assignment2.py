@@ -33,8 +33,24 @@ class PriorityQueue:
         else:
             for i in range(len(self.pqueue)):
 
-                if(self.pqueue[i][1] <= priority):
+                if(self.pqueue[i][1] < priority):
                     self.pqueue.insert(i, [value, priority])
+                    self.length += 1
+                    didInsert = True
+                    break
+
+                elif (self.pqueue[i][1] == priority):
+
+                    to_add = "".join(map(str, value))
+                    to_check = "".join(map(str, self.pqueue[i][0]))
+                    if(to_add < to_check):
+
+                        self.pqueue.insert(i+1, [value, priority])
+
+                    else:
+                        self.pqueue.insert(i, [value, priority])
+
+
                     self.length += 1
                     didInsert = True
                     break
@@ -103,12 +119,14 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
             break
 
         # Exploring adjacent nodes
-        for adjacent_node in range(1, meta_data["node_count"]+1):
+        for adjacent_node in range(meta_data["node_count"], 0, -1):
             if(not visited[adjacent_node] and cost[node][adjacent_node] != -1):
                 holder_stack.append(adjacent_node)
-                break   
+                
 
     return path
+
+
 
 
 def UCS_Traversal(meta_data, start_point, goals, cost):
@@ -124,9 +142,10 @@ def UCS_Traversal(meta_data, start_point, goals, cost):
     while not PriorityQ.isQueueEmpty():
         
         # print("while loop begins------------------------------")
-        # PriorityQ.display(showPriority=True)
+        PriorityQ.display(showPriority=True)
         # time.sleep(1)
 
+        # print("----> ", PriorityQ.pqueue)
         # Dequeue Max Priority element : Which will be the last element in queue with least cost
         path = PriorityQ.pqueue[-1][0]
         priority = PriorityQ.pqueue[-1][1]
