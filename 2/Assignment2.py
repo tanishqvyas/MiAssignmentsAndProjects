@@ -142,7 +142,7 @@ def UCS_Traversal(meta_data, start_point, goals, cost):
     while not PriorityQ.isQueueEmpty():
         
         # print("while loop begins------------------------------")
-        PriorityQ.display(showPriority=True)
+        # PriorityQ.display(showPriority=True)
         # time.sleep(1)
 
         # print("----> ", PriorityQ.pqueue)
