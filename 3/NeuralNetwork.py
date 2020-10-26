@@ -16,6 +16,10 @@ from sklearn.model_selection import train_test_split
 
 class NN:
 
+	def sigmoid (x):
+		z = 1/(1 + np.exp(-x)) 
+		return z
+
 
 	def __init__(self, x_train, y_train, x_test, y_test):
 		self.x_train = x_train
@@ -105,6 +109,8 @@ if __name__ == "__main__":
 
 	# Making a train_test_split
 	x_train, x_test, y_train, y_test = train_test_split(features, label, test_size= 0.2, random_state= 42)
+
+
 
 	
 
