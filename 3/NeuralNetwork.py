@@ -4,9 +4,24 @@ Design of a Neural Network from scratch
 *************<IMP>*************
 Mention hyperparameters used and describe functionality in detail in this space
 - carries 1 mark
+
+
+
 '''
 
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split 
+
+
 class NN:
+
+
+	def __init__(self, x_train, y_train, x_test, y_test):
+		self.x_train = x_train
+		self.y_train = y_train
+		self.x_test = x_test
+		self.y_test = y_test
 
 	''' X and Y are dataframes '''
 	
@@ -74,5 +89,24 @@ class NN:
 
 
 	
+if __name__ == "__main__":
+	
+	# Reading in the Data Set
+	dataset = pd.read_csv("LBW_Dataset.csv")
+	print(dataset.head())
+
+	# <-------------- Pre processing of DataFrame--------------------->
+
+
+	# Extracting Features and Labels
+	features = dataset.drop(dataset.columns[[-1]], axis=1)  # Remove last Column
+	label = dataset[dataset.columns[-1]]  					# Extract Last Column
+
+
+	# Making a train_test_split
+	x_train, x_test, y_train, y_test = train_test_split(features, label, test_size= 0.2, random_state= 42)
+
+	
+
 
 
