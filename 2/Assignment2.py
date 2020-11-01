@@ -33,8 +33,24 @@ class PriorityQueue:
         else:
             for i in range(len(self.pqueue)):
 
-                if(self.pqueue[i][1] <= priority):
+                if(self.pqueue[i][1] < priority):
                     self.pqueue.insert(i, [value, priority])
+                    self.length += 1
+                    didInsert = True
+                    break
+
+                elif (self.pqueue[i][1] == priority):
+
+                    to_add = "".join(map(str, value))
+                    to_check = "".join(map(str, self.pqueue[i][0]))
+                    if(to_add < to_check):
+
+                        self.pqueue.insert(i+1, [value, priority])
+
+                    else:
+                        self.pqueue.insert(i, [value, priority])
+
+
                     self.length += 1
                     didInsert = True
                     break
@@ -98,17 +114,19 @@ def DFS_Traversal(meta_data, start_point, goals, cost):
             if(node in goals):
                 isPathFound = True
 
+
         # Checking if the new node is goal node or not
         if(isPathFound):
             break
 
         # Exploring adjacent nodes
-        for adjacent_node in range(1, meta_data["node_count"]+1):
+        for adjacent_node in range(meta_data["node_count"], 0, -1):
             if(not visited[adjacent_node] and cost[node][adjacent_node] != -1):
                 holder_stack.append(adjacent_node)
-                break   
-
+                
+                
     return path
+
 
 
 def UCS_Traversal(meta_data, start_point, goals, cost):
@@ -127,6 +145,7 @@ def UCS_Traversal(meta_data, start_point, goals, cost):
         # PriorityQ.display(showPriority=True)
         # time.sleep(1)
 
+        # print("----> ", PriorityQ.pqueue)
         # Dequeue Max Priority element : Which will be the last element in queue with least cost
         path = PriorityQ.pqueue[-1][0]
         priority = PriorityQ.pqueue[-1][1]
@@ -246,6 +265,7 @@ def tri_traversal(cost, heuristic, start_point, goals):
 
     meta_data["node_count"] = len(cost) - 1
 
+
     t1 = DFS_Traversal(meta_data, start_point, goals, cost)
     t2 = UCS_Traversal(meta_data, start_point, goals, cost)
     t3 = A_star_Traversal(meta_data, start_point, goals, cost, heuristic)
@@ -255,29 +275,3 @@ def tri_traversal(cost, heuristic, start_point, goals):
     l.append(t3)
 
     return l
-
-
-if __name__ == '__main__':
-    
-    obj = PriorityQueue()
-
-    obj.insert("u", 1)
-    obj.display()
-    obj.insert("o", 2)
-    obj.display()
-    obj.insert("i", 3)
-    obj.display()
-    obj.insert("e", 4)
-    obj.display()
-    obj.insert("a", 4)
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
-    obj.delete()
-    obj.display()
