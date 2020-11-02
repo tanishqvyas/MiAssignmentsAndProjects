@@ -142,7 +142,37 @@ if __name__ == "__main__":
 	print(dataset.head())
 
 	# <-------------- Pre processing of DataFrame--------------------->
+	import pandas as pd  #importing pandas and numpy
 
+	dataset.describe()
+
+	print(dataset.isnull().sum())  #sum of all null values in dataset per column
+
+	print(dataset["Age"].mean())  #mean of Age
+
+	dataset['Age'].fillna(value=dataset['Age'].mean(), inplace=True) #replacing all missing values with mean of Age
+
+	print(dataset["Weight"].mean())  #mean of Weight
+
+	dataset['Weight'].fillna(value=dataset['Weight'].mean(), inplace=True)  #replacing all missing values with mean of Weight
+
+	dataset['Delivery phase'].fillna(dataset['Delivery phase'].mode()[0], inplace=True) #replacing all missing values with mode of Delivery phase
+
+	print(dataset["HB"].mean())  #mean of HB
+
+	dataset['HB'].fillna(value=dataset['HB'].mean(), inplace=True)  #replacing all missing values with mean of HB
+
+	print(dataset["BP"].mean())  #mean of BP
+
+	dataset['BP'].fillna(value=dataset['BP'].mean(), inplace=True)  #replacing all missing values with mean of BP
+
+	dataset["Education"].fillna( method ='ffill', inplace = True) #using the ffill method to fill in the missing values in Education
+
+	dataset["Residence"].fillna( method ='ffill', inplace = True)  #using the ffill method to fill in the missing values in Residence
+
+	print(dataset.isnull().sum())  #no null values remaining in dataset, it has been cleaned
+
+	print(dataset)
 
 	# Extracting Features and Labels
 	features = dataset.drop(dataset.columns[[-1]], axis=1)  # Remove last Column
