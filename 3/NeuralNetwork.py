@@ -16,9 +16,51 @@ from sklearn.model_selection import train_test_split
 
 class NN:
 
+	# Activation Functions
 	def sigmoid (x):
 		z = 1/(1 + np.exp(-x)) 
 		return z
+
+	def relu(X):
+   		return np.maximum(0,X)
+
+	def softmax(X):
+		expo = np.exp(X)
+		expo_sum = np.sum(np.exp(X))
+		return expo/expo_sum
+
+	def leakyrelu(x):
+		return np.where(x > 0, x, x * 0.01) 
+
+	def tanh(x):
+		t=(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
+		return t
+	
+	# End of activation Functions
+
+	# cost function
+
+	# Mean squared error loss
+	# out -> label predictions
+	# Y -> actual true label
+	def mse_loss(out, Y): 
+		s =(np.square(out-Y)) 
+		cost = np.sum(s)/len(y) 
+		return cost
+
+	# binary cost entropy cost
+	def crossentropy_cost(AL, Y):
+    	# number of examples
+		m = Y.shape[1]
+		# Compute loss from AL and y.
+		cost = -1./m * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
+		# To make sure our cost's shape is what we expect 
+		cost = np.squeeze(cost)
+		
+		return cost
+
+	# end of cost Functions
+	# end of cost function
 
 
 	def __init__(self, x_train, y_train, x_test, y_test):
