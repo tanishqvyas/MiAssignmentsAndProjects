@@ -5,6 +5,19 @@ Design of a Neural Network from scratch
 Mention hyperparameters used and describe functionality in detail in this space
 - carries 1 mark
 
+test_split_size : 
+
+Number of Layers :
+Number of Nodes in L1 :
+Number of Nodes in L2 :
+
+Number of Epochs :
+Learning Rate :
+Initialization of Weights and Biases : 
+
+Activation Function in L1 :
+Activation Function in L2 :
+
 
 
 '''
@@ -14,7 +27,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split 
 
 
-class NN:
+class NeuralNetworkFromScratch:
 
 	# Activation Functions
 	def sigmoid (x):
@@ -53,21 +66,67 @@ class NN:
     	# number of examples
 		m = Y.shape[1]
 		# Compute loss from AL and y.
-		cost = -1./m * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
+		cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
 		# To make sure our cost's shape is what we expect 
 		cost = np.squeeze(cost)
 		
 		return cost
 
-	# end of cost Functions
-	# end of cost function
 
-
-	def __init__(self, x_train, y_train, x_test, y_test):
+	# Initialization
+	def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation):
 		self.x_train = x_train
 		self.y_train = y_train
 		self.x_test = x_test
 		self.y_test = y_test
+		self.size_of_ip_layer = size_of_ip_layer,
+		self.size_of_hidden_layer = size_of_hidden_layer,
+		self.size_of_op_layer = size_of_op_layer
+		self.ip_layer_activation = ip_layer_activation
+		self.hidden_layer_activation = hidden_layer_activation
+		self.op_layer_activation = op_layer_activation
+	
+
+	# Function to initialize weights and biases
+	def initialize_weights_and_biases(self):
+
+		W1 = np.random.randn(self.size_of_hidden_layer, self.size_of_ip_layer) * 0.01
+		b1 = np.zeros((self.size_of_hidden_layer, 1))
+		W2 = np.random.randn(self.size_of_op_layer, self.size_of_hidden_layer) * 0.01
+		b2 = np.zeros((self.size_of_op_layer, 1))
+
+		weights_and_biases = {
+			"w1": W1,
+			"b1": b1,
+			"w2": W2,
+			"b2": b2
+		}
+
+		return weights_and_biases
+
+
+	def summary(self):
+
+		print("---------------Model Summary----------------")
+		print("Shapes of Test and Train Data : \n")
+		print("X Train Shape : ", self.x_train.shape)
+		print("Y Train Shape : ", self.y_train.shape)
+		print("X Test Shape : ", self.x_test.shape)
+		print("Y Test Shape : ", self.y_test.shape)
+
+		print("\nSize of Input Layer : ", self.size_of_ip_layer)
+		print("Size of Hidden Layer : ", self.size_of_hidden_layer)
+		print("Size of Output Layer : ", self.size_of_op_layer)
+
+		print("\nActivation for Input Layer : ", self.ip_layer_activation)
+		print("Activation for Hidden Layer : ", self.hidden_layer_activation)
+		print("Activation for Output Layer : ", self.op_layer_activation)
+
+
+
+
+
+
 
 	''' X and Y are dataframes '''
 	
@@ -142,7 +201,6 @@ if __name__ == "__main__":
 	print(dataset.head())
 
 	# <-------------- Pre processing of DataFrame--------------------->
-	import pandas as pd  #importing pandas and numpy
 
 	dataset.describe()
 
@@ -180,9 +238,19 @@ if __name__ == "__main__":
 
 
 	# Making a train_test_split
-	x_train, x_test, y_train, y_test = train_test_split(features, label, test_size= 0.2, random_state= 42)
+	x_train, x_test, y_train, y_test = train_test_split(features, label, test_size= 0.13, random_state= 42)
 
 
+	# Creating the Model
+	model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
+										size_of_ip_layer = 9,
+										size_of_hidden_layer = 13,
+										size_of_op_layer = 2,
+										ip_layer_activation = "relu",
+										hidden_layer_activation = "relu",
+										op_layer_activation = "relu"
+											)
+	model.summary()
 
 	
 
