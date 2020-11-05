@@ -30,22 +30,23 @@ from sklearn.model_selection import train_test_split
 class NeuralNetworkFromScratch:
 
 	# Activation Functions
-	def sigmoid (x):
-		z = 1/(1 + np.exp(-x)) 
+
+	def sigmoid (self, X):
+		z = 1/(1 + np.exp(-X)) 
 		return z
 
-	def relu(X):
+	def relu(self, X):
    		return np.maximum(0,X)
 
-	def softmax(X):
+	def softmax(self, X):
 		expo = np.exp(X)
 		expo_sum = np.sum(np.exp(X))
 		return expo/expo_sum
 
-	def leakyrelu(x):
+	def leakyrelu(self, x):
 		return np.where(x > 0, x, x * 0.01) 
 
-	def tanh(x):
+	def tanh(self, x):
 		t=(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
 		return t
 	
@@ -56,17 +57,18 @@ class NeuralNetworkFromScratch:
 	# Mean squared error loss
 	# out -> label predictions
 	# Y -> actual true label
-	def mse_loss(out, Y): 
+	def mse_loss(self, out, Y): 
 		s =(np.square(out-Y)) 
 		cost = np.sum(s)/len(y) 
 		return cost
 
 	# binary cost entropy cost
-	def crossentropy_cost(AL, Y):
+	def crossentropy_cost(self, AL, Y):
     	# number of examples
 		m = Y.shape[1]
 		# Compute loss from AL and y.
 		cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
+
 		# To make sure our cost's shape is what we expect 
 		cost = np.squeeze(cost)
 		
@@ -74,17 +76,23 @@ class NeuralNetworkFromScratch:
 
 
 	# Initialization
-	def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation):
-		self.x_train = x_train
-		self.y_train = y_train
-		self.x_test = x_test
-		self.y_test = y_test
-		self.size_of_ip_layer = size_of_ip_layer,
-		self.size_of_hidden_layer = size_of_hidden_layer,
+	def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch):
+		self.x_train = x_train.to_numpy()
+		self.y_train = y_train.to_numpy()
+		self.x_test = x_test.to_numpy()
+		self.y_test = y_test.to_numpy()
+
+		self.size_of_ip_layer = size_of_ip_layer
+		self.size_of_hidden_layer = size_of_hidden_layer
 		self.size_of_op_layer = size_of_op_layer
+
 		self.ip_layer_activation = ip_layer_activation
 		self.hidden_layer_activation = hidden_layer_activation
 		self.op_layer_activation = op_layer_activation
+		self.epochs = num_epoch
+
+		self.weights_and_biases = {}
+
 	
 
 	# Function to initialize weights and biases
@@ -102,20 +110,22 @@ class NeuralNetworkFromScratch:
 			"b2": b2
 		}
 
-		return weights_and_biases
-
+		self.weights_and_biases = weights_and_biases
+		
 
 	def summary(self):
 
 		print("---------------Model Summary----------------")
-		print("Shapes of Test and Train Data : \n")
+		print("Number of Epochs : ", self.epochs)
+
+		print("\nShapes of Test and Train Data : \n")
 		print("X Train Shape : ", self.x_train.shape)
 		print("Y Train Shape : ", self.y_train.shape)
 		print("X Test Shape : ", self.x_test.shape)
 		print("Y Test Shape : ", self.y_test.shape)
 
-		print("\nSize of Input Layer : ", self.size_of_ip_layer)
-		print("Size of Hidden Layer : ", self.size_of_hidden_layer)
+		# print("\nSize of Input Layer : ", self.size_of_ip_layer)
+		# print("Size of Hidden Layer : ", self.size_of_hidden_layer)
 		print("Size of Output Layer : ", self.size_of_op_layer)
 
 		print("\nActivation for Input Layer : ", self.ip_layer_activation)
@@ -125,16 +135,47 @@ class NeuralNetworkFromScratch:
 
 
 
+	def forward_pass(self):
+
+		Z1 = np.dot(self.weights_and_biases["w1"], self.x_train.T) + self.weights_and_biases["b1"]
+		A1 = self.sigmoid(Z1)
+		Z2 = np.dot(self.weights_and_biases["w2"], Z1) + self.weights_and_biases["b2"]
+		A2 = self.sigmoid(Z2)
+
+		Y_pred = self.sigmoid(A2)
+
+
+		return Y_pred.T
 
 
 
 	''' X and Y are dataframes '''
 	
-	def fit(self,X,Y):
+	def fit(self):
 		'''
 		Function that trains the neural network by taking x_train and y_train samples as input
 		'''
-	
+
+		for epoch in range(self.epochs):
+
+			# Compute forward Pass
+			y_pred = self.forward_pass()
+
+			# Compute the Loss
+			# loss = self.crossentropy_cost(self.y_train, y_pred)
+			# print(loss)
+
+			# Compute the Backward Pass
+
+
+
+			# Update the Parameters
+
+
+		
+		# Save the model
+
+
 	def predict(self,X):
 
 		"""
@@ -145,6 +186,8 @@ class NeuralNetworkFromScratch:
 		"""
 		
 		return yhat
+
+
 
 	def CM(y_test,y_test_obs):
 		'''
@@ -244,14 +287,22 @@ if __name__ == "__main__":
 	# Creating the Model
 	model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
 										size_of_ip_layer = 9,
-										size_of_hidden_layer = 13,
-										size_of_op_layer = 2,
+										size_of_hidden_layer = 15,
+										size_of_op_layer = 1,
 										ip_layer_activation = "relu",
 										hidden_layer_activation = "relu",
-										op_layer_activation = "relu"
+										op_layer_activation = "relu",
+										num_epoch = 1
 											)
+
+	# Initializing weights and biases
+	model.initialize_weights_and_biases()
+
+	# Print the model summary
 	model.summary()
 
+	# Training the Model
+	model.fit()
 	
 
 
