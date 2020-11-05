@@ -29,8 +29,8 @@ class NN:
 		expo_sum = np.sum(np.exp(X))
 		return expo/expo_sum
 
-	def leakyrelu(x):
-		return np.where(x > 0, x, x * 0.01) 
+	def leakyrelu(x, theta=0.01):
+		return np.where(x > 0, x, x * theta) 
 
 	def tanh(x):
 		t=(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
