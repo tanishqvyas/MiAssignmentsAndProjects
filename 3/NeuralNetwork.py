@@ -35,6 +35,10 @@ class NeuralNetworkFromScratch:
 		z = 1/(1 + np.exp(-X)) 
 		return z
 
+	def sigmoid_der(self,x):
+		y=self.sigmoid(x) *(1-self.sigmoid(x))
+		return y
+
 	def relu(self, X):
    		return np.maximum(0,X)
 
@@ -43,13 +47,8 @@ class NeuralNetworkFromScratch:
 		expo_sum = np.sum(np.exp(X))
 		return expo/expo_sum
 
-<<<<<<< HEAD
 	def leakyrelu(x, theta=0.01):
 		return np.where(x > 0, x, x * theta) 
-=======
-	def leakyrelu(self, x):
-		return np.where(x > 0, x, x * 0.01) 
->>>>>>> c766fe4dfa932381220a73039d271b05da04f3c7
 
 	def tanh(self, x):
 		t=(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
@@ -64,7 +63,7 @@ class NeuralNetworkFromScratch:
 	# Y -> actual true label
 	def mse_loss(self, out, Y): 
 		s =(np.square(out-Y)) 
-		cost = np.sum(s)/len(y) 
+		cost = np.sum(s)/len(Y) 
 		return cost
 
 	# binary cost entropy cost
@@ -144,13 +143,43 @@ class NeuralNetworkFromScratch:
 
 		Z1 = np.dot(self.weights_and_biases["w1"], self.x_train.T) + self.weights_and_biases["b1"]
 		A1 = self.sigmoid(Z1)
-		Z2 = np.dot(self.weights_and_biases["w2"], Z1) + self.weights_and_biases["b2"]
+		Z2 = np.dot(self.weights_and_biases["w2"], A1) + self.weights_and_biases["b2"]
 		A2 = self.sigmoid(Z2)
 
-		Y_pred = self.sigmoid(A2)
+		# print(Z1.shape)
+		# print(A1.shape)
+		# Y_pred = self.sigmoid(A2)
+		Y_pred=A2
+		# print(Y_pred.shape)
 
 
 		return Y_pred.T
+
+	def backward_prop(self):
+
+		#learning rate
+			lr=0.5
+
+		dcost_dao=(self.y_train.T)-y_pred
+		dao_dzo= self.sigmoid_der(Z2)
+		dzo_dwo=A1
+
+		# print(dzo_dwo.shape)
+		# print(dcost_dao.shape)
+		# print(dao_dzo.shape)
+		dcost_wo = np.dot(dzo_dwo, (dcost_dao * dao_dzo).T)
+
+		# dcost_w1 = dcost_dah * dah_dzh * dzh_dw1
+		# dcost_dah = dcost_dzo * dzo_dah
+
+		dcost_dzo = dcost_dao * dao_dzo
+		dzo_dah = self.weights_and_biases["w2"]
+		dcost_dah = np.dot( dzo_dah.T, dcost_dzo)
+		dah_dzh = self.sigmoid_der(A1) 
+		dzh_dwh = x_train
+		dcost_wh = np.dot( (dah_dzh * dcost_dah), dzh_dwh)
+
+
 
 
 
@@ -164,17 +193,53 @@ class NeuralNetworkFromScratch:
 		for epoch in range(self.epochs):
 
 			# Compute forward Pass
-			y_pred = self.forward_pass()
+			# y_pred = self.forward_pass()
+
+			Z1 = np.dot(self.weights_and_biases["w1"], self.x_train.T) + self.weights_and_biases["b1"]
+			A1 = self.sigmoid(Z1)
+			Z2 = np.dot(self.weights_and_biases["w2"], A1) + self.weights_and_biases["b2"]
+			A2 = self.sigmoid(Z2)
+			y_pred=A2
+
 
 			# Compute the Loss
-			# loss = self.crossentropy_cost(self.y_train, y_pred)
-			# print(loss)
+			# loss = self.mse_loss(self.y_train, y_pred)
+			# print("lossssss is: ",loss)
+			error_out = ((1 / 2) * (np.power((self.y_train.T - y_pred), 2)))
+			print(error_out.sum())
 
 			# Compute the Backward Pass
 
+			# final=self.backward_prop()
 
+			#learning rate
+			lr=0.5
+		
+			dcost_dao=(self.y_train.T)-y_pred
+			dao_dzo= self.sigmoid_der(Z2)
+			dzo_dwo=A1
+
+			# print(dzo_dwo.shape)
+			# print(dcost_dao.shape)
+			# print(dao_dzo.shape)
+			dcost_wo = np.dot(dzo_dwo, (dcost_dao * dao_dzo).T)
+
+			# dcost_w1 = dcost_dah * dah_dzh * dzh_dw1
+			# dcost_dah = dcost_dzo * dzo_dah
+
+			dcost_dzo = dcost_dao * dao_dzo
+			dzo_dah = self.weights_and_biases["w2"]
+			dcost_dah = np.dot( dzo_dah.T, dcost_dzo)
+			dah_dzh = self.sigmoid_der(A1) 
+			dzh_dwh = x_train
+			dcost_wh = np.dot( (dah_dzh * dcost_dah), dzh_dwh)
 
 			# Update the Parameters
+			# self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - lr * dcost_wh
+			# self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - lr * (dcost_wo).T
+
+
+
 
 
 		
@@ -297,7 +362,7 @@ if __name__ == "__main__":
 										ip_layer_activation = "relu",
 										hidden_layer_activation = "relu",
 										op_layer_activation = "relu",
-										num_epoch = 1
+										num_epoch = 10
 											)
 
 	# Initializing weights and biases
