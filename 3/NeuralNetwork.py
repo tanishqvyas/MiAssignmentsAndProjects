@@ -59,7 +59,7 @@ class NeuralNetworkFromScratch:
 	# Y -> actual true label
 	def mse_loss(self, out, Y): 
 		s =(np.square(out-Y)) 
-		cost = np.sum(s)/len(y) 
+		cost = np.sum(s)/len(Y) 
 		return cost
 
 	# binary cost entropy cost
@@ -162,8 +162,7 @@ class NeuralNetworkFromScratch:
 			y_pred = self.forward_pass()
 
 			# Compute the Loss
-			# loss = self.crossentropy_cost(self.y_train, y_pred)
-			# print(loss)
+			loss = self.mse_loss(self.y_train, y_pred)
 
 			# Compute the Backward Pass
 
@@ -274,6 +273,7 @@ if __name__ == "__main__":
 	print(dataset.isnull().sum())  #no null values remaining in dataset, it has been cleaned
 
 	print(dataset)
+
 
 	# Extracting Features and Labels
 	features = dataset.drop(dataset.columns[[-1]], axis=1)  # Remove last Column
