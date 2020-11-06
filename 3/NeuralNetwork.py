@@ -5,7 +5,7 @@ Design of a Neural Network from scratch
 Mention hyperparameters used and describe functionality in detail in this space
 - carries 1 mark
 
-test_split_size : 
+test_split_size :
 
 Number of Layers :
 Number of Nodes in L1 :
@@ -13,7 +13,7 @@ Number of Nodes in L2 :
 
 Number of Epochs :
 Learning Rate :
-Initialization of Weights and Biases : 
+Initialization of Weights and Biases :
 
 Activation Function in L1 :
 Activation Function in L2 :
@@ -24,23 +24,23 @@ Activation Function in L2 :
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split 
+from sklearn.model_selection import train_test_split
 
 
 class NeuralNetworkFromScratch:
 
 	# Activation Functions
 
-	def sigmoid (self, X):
-		z = 1/(1 + np.exp(-X)) 
+	def sigmoid(self, X):
+		z = 1/(1 + np.exp(-X))
 		return z
 
-	def sigmoid_der(self,x):
-		y=self.sigmoid(x) *(1-self.sigmoid(x))
+	def sigmoid_der(self, x):
+		y = self.sigmoid(x) * (1-self.sigmoid(x))
 		return y
 
 	def relu(self, X):
-   		return np.maximum(0,X)
+   		return np.maximum(0, X)
 
 	def softmax(self, X):
 		expo = np.exp(X)
@@ -48,12 +48,12 @@ class NeuralNetworkFromScratch:
 		return expo/expo_sum
 
 	def leakyrelu(x, theta=0.01):
-		return np.where(x > 0, x, x * theta) 
+		return np.where(x > 0, x, x * theta)
 
 	def tanh(self, x):
-		t=(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
+		t = (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
 		return t
-	
+
 	# End of activation Functions
 
 	# cost function
@@ -61,9 +61,9 @@ class NeuralNetworkFromScratch:
 	# Mean squared error loss
 	# out -> label predictions
 	# Y -> actual true label
-	def mse_loss(self, out, Y): 
-		s =(np.square(out-Y)) 
-		cost = np.sum(s)/len(Y) 
+	def mse_loss(self, out, Y):
+		s = (np.square(out-Y))
+		cost = np.sum(s)/len(Y)
 		return cost
 
 	# binary cost entropy cost
@@ -73,14 +73,14 @@ class NeuralNetworkFromScratch:
 		# Compute loss from AL and y.
 		cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
 
-		# To make sure our cost's shape is what we expect 
+		# To make sure our cost's shape is what we expect
 		cost = np.squeeze(cost)
-		
+
 		return cost
 
-
 	# Initialization
-	def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch):
+
+	def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate):
 		self.x_train = x_train.to_numpy()
 		self.y_train = y_train.to_numpy()
 		self.x_test = x_test.to_numpy()
@@ -94,12 +94,11 @@ class NeuralNetworkFromScratch:
 		self.hidden_layer_activation = hidden_layer_activation
 		self.op_layer_activation = op_layer_activation
 		self.epochs = num_epoch
-
+		self.learning_rate = learning_rate
 		self.weights_and_biases = {}
 
-	
-
 	# Function to initialize weights and biases
+
 	def initialize_weights_and_biases(self):
 
 		W1 = np.random.randn(self.size_of_hidden_layer, self.size_of_ip_layer) * 0.01
@@ -115,7 +114,6 @@ class NeuralNetworkFromScratch:
 		}
 
 		self.weights_and_biases = weights_and_biases
-		
 
 	def summary(self):
 
@@ -136,31 +134,24 @@ class NeuralNetworkFromScratch:
 		print("Activation for Hidden Layer : ", self.hidden_layer_activation)
 		print("Activation for Output Layer : ", self.op_layer_activation)
 
-
-
-
 	def forward_pass(self):
 
-		Z1 = np.dot(self.weights_and_biases["w1"], self.x_train.T) + self.weights_and_biases["b1"]
+		Z1 = np.dot(self.weights_and_biases["w1"],
+		            self.x_train.T) + self.weights_and_biases["b1"]
 		A1 = self.sigmoid(Z1)
-		Z2 = np.dot(self.weights_and_biases["w2"], A1) + self.weights_and_biases["b2"]
+		Z2 = np.dot(self.weights_and_biases["w2"],
+		            A1) + self.weights_and_biases["b2"]
 		A2 = self.sigmoid(Z2)
 
-		# print(Z1.shape)
-		# print(A1.shape)
-		# Y_pred = self.sigmoid(A2)
-		Y_pred=A2
-		# print(Y_pred.shape)
 
+		Y_pred = A2
 
 		return Y_pred.T
 
 	def backward_prop(self):
 
-		#learning rate
-			lr=0.5
 
-		dcost_dao=(self.y_train.T)-y_pred
+		dcost_dao=(self.y_train.T)- y_pred
 		dao_dzo= self.sigmoid_der(Z2)
 		dzo_dwo=A1
 
@@ -193,13 +184,7 @@ class NeuralNetworkFromScratch:
 		for epoch in range(self.epochs):
 
 			# Compute forward Pass
-			# y_pred = self.forward_pass()
-
-			Z1 = np.dot(self.weights_and_biases["w1"], self.x_train.T) + self.weights_and_biases["b1"]
-			A1 = self.sigmoid(Z1)
-			Z2 = np.dot(self.weights_and_biases["w2"], A1) + self.weights_and_biases["b2"]
-			A2 = self.sigmoid(Z2)
-			y_pred=A2
+			y_pred = self.forward_pass()
 
 
 			# Compute the Loss
@@ -212,16 +197,13 @@ class NeuralNetworkFromScratch:
 
 			# final=self.backward_prop()
 
-			#learning rate
-			lr=0.5
+			# learning rate
 		
 			dcost_dao=(self.y_train.T)-y_pred
 			dao_dzo= self.sigmoid_der(Z2)
 			dzo_dwo=A1
 
-			# print(dzo_dwo.shape)
-			# print(dcost_dao.shape)
-			# print(dao_dzo.shape)
+
 			dcost_wo = np.dot(dzo_dwo, (dcost_dao * dao_dzo).T)
 
 			# dcost_w1 = dcost_dah * dah_dzh * dzh_dw1
@@ -235,8 +217,10 @@ class NeuralNetworkFromScratch:
 			dcost_wh = np.dot( (dah_dzh * dcost_dah), dzh_dwh)
 
 			# Update the Parameters
-			# self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - lr * dcost_wh
-			# self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - lr * (dcost_wo).T
+			# self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - self.learning_rate * dcost_wh
+			# self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - self.learning_rate * (dcost_wo).T
+			# self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - self.learning_rate * 
+			# self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - self.learning_rate * 
 
 
 
@@ -363,7 +347,8 @@ if __name__ == "__main__":
 										ip_layer_activation = "relu",
 										hidden_layer_activation = "relu",
 										op_layer_activation = "relu",
-										num_epoch = 10
+										num_epoch = 10,
+										learning_rate = 0.001
 											)
 
 	# Initializing weights and biases
