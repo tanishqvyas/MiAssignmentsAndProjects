@@ -99,21 +99,28 @@ class NeuralNetworkFromScratch:
 
 	# Function to initialize weights and biases
 
-	def initialize_weights_and_biases(self):
+	def initialize_weights_and_biases(self, model_weights_biases = None):
 
-		W1 = np.random.randn(self.size_of_hidden_layer, self.size_of_ip_layer) * 0.01
-		b1 = np.zeros((self.size_of_hidden_layer, 1))
-		W2 = np.random.randn(self.size_of_op_layer, self.size_of_hidden_layer) * 0.01
-		b2 = np.zeros((self.size_of_op_layer, 1))
+		# Initializing untrained model
+		if(model_weights_biases == None):
 
-		weights_and_biases = {
-			"w1": W1,
-			"b1": b1,
-			"w2": W2,
-			"b2": b2
-		}
+			W1 = np.random.randn(self.size_of_hidden_layer, self.size_of_ip_layer) * 0.01
+			b1 = np.zeros((self.size_of_hidden_layer, 1))
+			W2 = np.random.randn(self.size_of_op_layer, self.size_of_hidden_layer) * 0.01
+			b2 = np.zeros((self.size_of_op_layer, 1))
 
-		self.weights_and_biases = weights_and_biases
+			weights_and_biases = {
+				"w1": W1,
+				"b1": b1,
+				"w2": W2,
+				"b2": b2
+			}
+
+			self.weights_and_biases = weights_and_biases
+
+		# Loading a trained model
+		else:
+			self.weights_and_biases = model_weights_biases
 
 	def summary(self):
 
@@ -126,108 +133,144 @@ class NeuralNetworkFromScratch:
 		print("X Test Shape : ", self.x_test.shape)
 		print("Y Test Shape : ", self.y_test.shape)
 
-		# print("\nSize of Input Layer : ", self.size_of_ip_layer)
-		# print("Size of Hidden Layer : ", self.size_of_hidden_layer)
+		print("Weights and Biases : \n")
+		print("W1 Shape : ", self.weights_and_biases["w1"].shape)
+		print("W2 Shape : ", self.weights_and_biases["w2"].shape)
+		print("b1 Shape : ", self.weights_and_biases["b1"].shape)
+		print("b2 Shape : ", self.weights_and_biases["b2"].shape)
+
+		print("\nSize of Input Layer : ", self.size_of_ip_layer)
+		print("Size of Hidden Layer : ", self.size_of_hidden_layer)
 		print("Size of Output Layer : ", self.size_of_op_layer)
 
 		print("\nActivation for Input Layer : ", self.ip_layer_activation)
 		print("Activation for Hidden Layer : ", self.hidden_layer_activation)
 		print("Activation for Output Layer : ", self.op_layer_activation)
 
+
+	# Function to return the current model
+	def get_current_model(self):
+		# Returning the weights and biases of the model
+		return self.weights_and_biases
+
+		
+
+
 	def forward_pass(self):
 
+		# Input layer
 		Z1 = np.dot(self.weights_and_biases["w1"],
 		            self.x_train.T) + self.weights_and_biases["b1"]
-		A1 = self.sigmoid(Z1)
+		A1 = self.relu(Z1)
+
+		# Hidden Layer
 		Z2 = np.dot(self.weights_and_biases["w2"],
 		            A1) + self.weights_and_biases["b2"]
-		A2 = self.sigmoid(Z2)
+		A2 = self.relu(Z2)
+
+		# Output Layer
+		Y_pred = self.sigmoid(A2)
+
+		params = {
+			"Z1" : Z1,
+			"A1" : A1.T,
+			"Z2" : Z2,
+			"A2" : A2.T,
+			"W2" : self.weights_and_biases["w2"]
+		}
+
+		return Y_pred.T, params
 
 
-		Y_pred = A2
+	def backward_pass(self, params):
 
-		return Y_pred.T
+		# Calculating partials deravatives
+		dY_by_dA2 = self.sigmoid_der(params["A2"])
 
-	def backward_prop(self):
+		dA2_by_dZ2 = self.sigmoid_der(params["Z2"])
 
+		dZ2_by_dW2 = params["A1"]
 
-		dcost_dao=(self.y_train.T)- y_pred
-		dao_dzo= self.sigmoid_der(Z2)
-		dzo_dwo=A1
+		# Since its 1 hence we never use
+		dZ2_by_db2 = np.ones((83, 1), dtype=int)
 
-		# print(dzo_dwo.shape)
-		# print(dcost_dao.shape)
-		# print(dao_dzo.shape)
-		dcost_wo = np.dot(dzo_dwo, (dcost_dao * dao_dzo).T)
+		dZ2_by_dA1 = params["W2"]
 
-		# dcost_w1 = dcost_dah * dah_dzh * dzh_dw1
-		# dcost_dah = dcost_dzo * dzo_dah
+		dA1_by_dZ1 = self.sigmoid_der(params["Z1"])
 
-		dcost_dzo = dcost_dao * dao_dzo
-		dzo_dah = self.weights_and_biases["w2"]
-		dcost_dah = np.dot( dzo_dah.T, dcost_dzo)
-		dah_dzh = self.sigmoid_der(A1) 
-		dzh_dwh = x_train
-		dcost_wh = np.dot( (dah_dzh * dcost_dah), dzh_dwh)
+		dZ1_by_dW1 = self.x_train
+
+		# Since its one we never use
+		dZ1_by_db1 = 1
 
 
 
+		dY_by_dZ2 =  dY_by_dA2 * dA2_by_dZ2.T
+
+		dY_by_dZ1 = np.dot(dY_by_dZ2 * dZ2_by_dA1, dA1_by_dZ1)
 
 
-	''' X and Y are dataframes '''
+		# Computing deravitives to adjust weights and biases using partial derivatives
+		dY_by_dW2 = np.dot(dY_by_dZ2.T, dZ2_by_dW2)
+
+		dY_by_db2 = np.dot( dY_by_dZ2.T, dZ2_by_db2)
+
+		dY_by_dW1 = np.dot(dY_by_dZ1 , dZ1_by_dW1)
+
+		dY_by_db1 = dY_by_dZ1
+
+		print("-------------------------------------------")
+		print("dY_by_dZ1 : ", dY_by_dZ1.shape)
+		print("dZ1_by_dW1 : ", dZ1_by_dW1.shape)
+		print("dY_by_dW1 : ", dY_by_dW1.shape)
+		print("-------------------------------------------")
+		
+		# Saving all the values
+		deravatives = {
+			"dw1" : dY_by_dW1,
+			"dw2" : dY_by_dW2,
+			"db1": dY_by_db1,
+			"db2": dY_by_db2
+		}
+
+
+		return deravatives
+
 	
 	def fit(self):
 		'''
 		Function that trains the neural network by taking x_train and y_train samples as input
 		'''
 
+		# Store History of training
+		history = {
+			"Training Loss" : [],
+			"Training Accuracy" : [],
+			"Testing Accuracy" : [],
+			"Test Loss": []
+		}
+
+		# Training 
 		for epoch in range(self.epochs):
 
 			# Compute forward Pass
-			y_pred = self.forward_pass()
+			y_train_pred, params = self.forward_pass()
 
+			# Compute Loss
+			loss = self.mse_loss(y_train_pred, self.y_train)
+			
 
-			# Compute the Loss
-			# loss = self.mse_loss(self.y_train, y_pred)
-			# print("lossssss is: ",loss)
-			error_out = ((1 / 2) * (np.power((self.y_train.T - y_pred), 2)))
-			print(error_out.sum())
+			# Back prop
+			deravatives = self.backward_pass(params)
+			
 
-			# Compute the Backward Pass
+			# Update Paramaters
+			self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - self.learning_rate*deravatives["dw2"]
+			self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - self.learning_rate*deravatives["db2"]
+			self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - self.learning_rate*deravatives["dw1"]
+			self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - self.learning_rate*deravatives["db1"]
 
-			# final=self.backward_prop()
-
-			# learning rate
-		
-			dcost_dao=(self.y_train.T)-y_pred
-			dao_dzo= self.sigmoid_der(Z2)
-			dzo_dwo=A1
-
-
-			dcost_wo = np.dot(dzo_dwo, (dcost_dao * dao_dzo).T)
-
-			# dcost_w1 = dcost_dah * dah_dzh * dzh_dw1
-			# dcost_dah = dcost_dzo * dzo_dah
-
-			dcost_dzo = dcost_dao * dao_dzo
-			dzo_dah = self.weights_and_biases["w2"]
-			dcost_dah = np.dot( dzo_dah.T, dcost_dzo)
-			dah_dzh = self.sigmoid_der(A1) 
-			dzh_dwh = x_train
-			dcost_wh = np.dot( (dah_dzh * dcost_dah), dzh_dwh)
-
-			# Update the Parameters
-			# self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - self.learning_rate * dcost_wh
-			# self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - self.learning_rate * (dcost_wo).T
-			# self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - self.learning_rate * 
-			# self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - self.learning_rate * 
-
-
-
-
-
-		
-		# Save the model
+			print("Loss for epoch #", epoch, " : ", loss)
 
 
 	def predict(self,X):
