@@ -71,7 +71,7 @@ class NeuralNetworkFromScratch:
     	# number of examples
 		m = Y.shape[1]
 		# Compute loss from AL and y.
-		cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))
+		cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)*np.log(1-AL))+0.00000000000001
 
 		# To make sure our cost's shape is what we expect
 		cost = np.squeeze(cost)
@@ -161,12 +161,15 @@ class NeuralNetworkFromScratch:
 		# Input layer
 		Z1 = np.dot(self.weights_and_biases["w1"],
 		            self.x_train.T) + self.weights_and_biases["b1"]
-		A1 = self.relu(Z1)
+		# print(self.weights_and_biases["w1"].shape)
+		# print(self.x_train.T.shape)
+		# print(self.weights_and_biases["b1"].shape)
+		A1 = self.sigmoid(Z1)
 
 		# Hidden Layer
 		Z2 = np.dot(self.weights_and_biases["w2"],
 		            A1) + self.weights_and_biases["b2"]
-		A2 = self.relu(Z2)
+		A2 = self.sigmoid(Z2)
 
 		# Output Layer
 		Y_pred = self.sigmoid(A2)
@@ -179,51 +182,94 @@ class NeuralNetworkFromScratch:
 			"W2" : self.weights_and_biases["w2"]
 		}
 
-		return Y_pred.T, params
+		return A2, params
 
 
 	def backward_pass(self, params):
 
 		# Calculating partials deravatives
-		dY_by_dA2 = self.sigmoid_der(params["A2"])
+		# dY_by_dA2 = self.sigmoid_der(params["A2"])
+		dY_by_dA2 = (self.y_train.T)-params["A2"].T
+		# print(dY_by_dA2.shape)
 
 		dA2_by_dZ2 = self.sigmoid_der(params["Z2"])
+		# print(dA2_by_dZ2.shape)
 
 		dZ2_by_dW2 = params["A1"]
+		# print(dZ2_by_dW2.shape)
+
+		dY_by_dW2=np.dot(dZ2_by_dW2.T,(dY_by_dA2 * dA2_by_dZ2).T)
+		# print(dY_by_dW2.shape)
+
+		# santosh code for part 2
+		
+
+		dY_by_dZ2 = dY_by_dA2 * dA2_by_dZ2
+		dZ2_by_dA1 = params["W2"]
+		dY_by_dA1=np.dot(dZ2_by_dA1.T, dY_by_dZ2)
+		dA1_by_dZ1= self.sigmoid_der(params["A1"])
+		dZ1_by_dW1= self.x_train
+		dY_by_dW1= np.dot((dA1_by_dZ1.T * dY_by_dA1), dZ1_by_dW1)
+
+		dY_by_dZ1= np.dot(dY_by_dA1, dA1_by_dZ1)
+
+
+		# print(dA1_by_dZ1.shape)
+		# print(dY_by_dA1.shape)
+		# print(dZ1_by_dW1.shape)
+
+		# end of santosh code for part 2
+
+
+
+
+		# tanishq's part
+
 
 		# Since its 1 hence we never use
-		dZ2_by_db2 = np.ones((83, 1), dtype=int)
+		dZ2_by_db2 = np.ones((15, 1), dtype=int)
 
-		dZ2_by_dA1 = params["W2"]
+		# dZ2_by_dA1 = params["W2"]
 
-		dA1_by_dZ1 = self.sigmoid_der(params["Z1"])
+		# dA1_by_dZ1 = self.sigmoid_der(params["A1"])
 
-		dZ1_by_dW1 = self.x_train
+		# dZ1_by_dW1 = self.x_train
 
-		# Since its one we never use
-		dZ1_by_db1 = 1
-
-
-
-		dY_by_dZ2 =  dY_by_dA2 * dA2_by_dZ2.T
-
-		dY_by_dZ1 = np.dot(dY_by_dZ2 * dZ2_by_dA1, dA1_by_dZ1)
+		# # Since its one we never use
+		dZ1_by_db1 = np.ones((1, 1), dtype=int)
 
 
-		# Computing deravitives to adjust weights and biases using partial derivatives
-		dY_by_dW2 = np.dot(dY_by_dZ2.T, dZ2_by_dW2)
+		# # dcost by dzo
+		# dY_by_dZ2 =  dY_by_dA2 * dA2_by_dZ2.T
 
-		dY_by_db2 = np.dot( dY_by_dZ2.T, dZ2_by_db2)
+		# dY_by_dZ1 = np.dot(dY_by_dZ2 * dZ2_by_dA1, dA1_by_dZ1)
+		# print(dY_by_dZ2.shape)
+		# print(dZ2_by_dA1.shape)
+		# print(dA1_by_dZ1.shape)
 
-		dY_by_dW1 = np.dot(dY_by_dZ1 , dZ1_by_dW1)
 
-		dY_by_db1 = dY_by_dZ1
+		# # Computing deravitives to adjust weights and biases using partial derivatives
+		# dY_by_dW2 = np.dot(dY_by_dZ2.T, dZ2_by_dW2)
+		# # print(dY_by_dZ2.shape)
+		# # print(dZ2_by_dW2.shape)
 
-		print("-------------------------------------------")
-		print("dY_by_dZ1 : ", dY_by_dZ1.shape)
-		print("dZ1_by_dW1 : ", dZ1_by_dW1.shape)
-		print("dY_by_dW1 : ", dY_by_dW1.shape)
-		print("-------------------------------------------")
+		# remove tthis
+		# dY_by_db2 = np.dot( dY_by_dZ2, dZ2_by_db2)
+		# just passing the above declared hard coded array here
+		dY_by_db2 = dZ2_by_db2
+
+		# dY_by_dW1 = np.dot(dY_by_dZ1 , dZ1_by_dW1)
+
+		# remove this
+		# dY_by_db1 = dY_by_dZ1
+		# just passing the above declared hard coded array here
+		dY_by_db1 = dZ1_by_db1
+
+		# print("-------------------------------------------")
+		# print("dY_by_dZ1 : ", dY_by_dZ1.shape)
+		# print("dZ1_by_dW1 : ", dZ1_by_dW1.shape)
+		# print("dY_by_dW1 : ", dY_by_dW1.shape)
+		# print("-------------------------------------------")
 		
 		# Saving all the values
 		deravatives = {
@@ -265,10 +311,14 @@ class NeuralNetworkFromScratch:
 			
 
 			# Update Paramaters
-			self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - self.learning_rate*deravatives["dw2"]
+			self.weights_and_biases["w2"] = self.weights_and_biases["w2"] + self.learning_rate*deravatives["dw2"]
 			self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - self.learning_rate*deravatives["db2"]
-			self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - self.learning_rate*deravatives["dw1"]
+			# print(self.weights_and_biases["w1"].shape)
+			# print(deravatives["dw1"].shape)
+			self.weights_and_biases["w1"] = self.weights_and_biases["w1"] + self.learning_rate*deravatives["dw1"]
 			self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - self.learning_rate*deravatives["db1"]
+			# print(deravatives["db1"].shape)
+			# print(self.weights_and_biases["b1"].shape)
 
 			print("Loss for epoch #", epoch, " : ", loss)
 
@@ -280,7 +330,9 @@ class NeuralNetworkFromScratch:
 		and outputs yhat values 
 
 		yhat is a list of the predicted value for df X
+		
 		"""
+
 		
 		return yhat
 
@@ -390,7 +442,7 @@ if __name__ == "__main__":
 										ip_layer_activation = "relu",
 										hidden_layer_activation = "relu",
 										op_layer_activation = "relu",
-										num_epoch = 10,
+										num_epoch = 120,
 										learning_rate = 0.001
 											)
 
