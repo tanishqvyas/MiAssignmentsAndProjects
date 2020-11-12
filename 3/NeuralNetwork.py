@@ -81,7 +81,7 @@ class NeuralNetworkFromScratch:
 
     # Initialization
 
-    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate):
+    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Random"):
         self.x_train = x_train.to_numpy()
         self.y_train = y_train.to_numpy()
         self.x_test = x_test.to_numpy()
@@ -99,6 +99,7 @@ class NeuralNetworkFromScratch:
         self.epochs = num_epoch
         self.learning_rate = learning_rate
         self.weights_and_biases = {}
+        self.type_of_initilization = type_of_initilization
 
     # Function to initialize weights and biases
 
@@ -107,11 +108,18 @@ class NeuralNetworkFromScratch:
         # Initializing untrained model
         if(model_weights_biases == None):
 
+            # Layer 1
             W1 = np.random.randn(self.size_of_hidden_layer,
-                                 self.size_of_ip_layer) * 0.01
+                                     self.size_of_ip_layer) * 0.01
+
             b1 = np.zeros((self.size_of_hidden_layer, 1))
-            W2 = np.random.randn(self.size_of_op_layer,
-                                 self.size_of_hidden_layer) * 0.01
+
+            
+            # Layer 2
+            if(self.type_of_initilization == "Random"):
+                W2 = np.random.randn(self.size_of_op_layer,
+                                     self.size_of_hidden_layer) * 0.01
+
             b2 = np.zeros((self.size_of_op_layer, 1))
 
             weights_and_biases = {
@@ -231,7 +239,7 @@ class NeuralNetworkFromScratch:
 
         num_of_elements = pred.shape[1]
         correct = 0
-        pred = pred.T
+        pred = np.round(pred.T)
         actual = actual.reshape((actual.shape[0], 1))
 
         for i in range(num_of_elements):
@@ -245,9 +253,7 @@ class NeuralNetworkFromScratch:
         Function that trains the neural network by taking x_train and y_train samples as input
         '''
 
-		# Taking current loss
-
-
+        # Taking current loss
 
         # Store History of training
         history = {
@@ -409,7 +415,8 @@ if __name__ == "__main__":
                                      hidden_layer_activation="relu",
                                      op_layer_activation="relu",
                                      num_epoch=12000,
-                                     learning_rate=0.001
+                                     learning_rate=0.001,
+                                     type_of_initilization="Random"
                                      )
 
     # Initializing weights and biases
