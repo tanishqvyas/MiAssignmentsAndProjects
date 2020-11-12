@@ -72,7 +72,7 @@ class NeuralNetworkFromScratch:
         m = Y.shape[1]
         # Compute loss from AL and y.
         cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)
-                                * np.log(1-AL))+0.00000000000001
+                                * np.log(1-AL))+ self.epsilon
 
         # To make sure our cost's shape is what we expect
         cost = np.squeeze(cost)
@@ -100,6 +100,10 @@ class NeuralNetworkFromScratch:
         self.learning_rate = learning_rate
         self.weights_and_biases = {}
         self.type_of_initilization = type_of_initilization
+
+
+        # Special varables 
+        self.epsilon = 1e-7
 
     # Function to initialize weights and biases
 
@@ -404,7 +408,7 @@ if __name__ == "__main__":
 
     # Making a train_test_split
     x_train, x_test, y_train, y_test = train_test_split(
-        features, label, test_size=0.13, random_state=42)
+        features, label, test_size=0.4, random_state=42)
 
     # Creating the Model
     model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
@@ -415,7 +419,7 @@ if __name__ == "__main__":
                                      hidden_layer_activation="relu",
                                      op_layer_activation="relu",
                                      num_epoch=12000,
-                                     learning_rate=0.001,
+                                     learning_rate=0.07,
                                      type_of_initilization="Random"
                                      )
 
