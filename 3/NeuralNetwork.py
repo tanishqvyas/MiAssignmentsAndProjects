@@ -72,7 +72,7 @@ class NeuralNetworkFromScratch:
         m = Y.shape[1]
         # Compute loss from AL and y.
         cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)
-                                * np.log(1-AL))+ self.epsilon
+                                * np.log(1-AL)) + self.epsilon
 
         # To make sure our cost's shape is what we expect
         cost = np.squeeze(cost)
@@ -101,9 +101,14 @@ class NeuralNetworkFromScratch:
         self.weights_and_biases = {}
         self.type_of_initilization = type_of_initilization
 
-
-        # Special varables 
+        # Special varables
         self.epsilon = 1e-7
+        self.history = {
+            "Training Loss": [],
+            "Training Accuracy": [],
+            "Testing Accuracy": [],
+            "Test Loss": []
+        }
 
     # Function to initialize weights and biases
 
@@ -114,11 +119,10 @@ class NeuralNetworkFromScratch:
 
             # Layer 1
             W1 = np.random.randn(self.size_of_hidden_layer,
-                                     self.size_of_ip_layer) * 0.01
+                                 self.size_of_ip_layer) * 0.01
 
             b1 = np.zeros((self.size_of_hidden_layer, 1))
 
-            
             # Layer 2
             if(self.type_of_initilization == "Random"):
                 W2 = np.random.randn(self.size_of_op_layer,
@@ -169,6 +173,11 @@ class NeuralNetworkFromScratch:
     def get_current_model(self):
         # Returning the weights and biases of the model
         return self.weights_and_biases
+
+    def get_history(self):
+
+        # Returning the history of the model
+        return self.history
 
     def forward_pass(self, X):
 
@@ -257,16 +266,6 @@ class NeuralNetworkFromScratch:
         Function that trains the neural network by taking x_train and y_train samples as input
         '''
 
-        # Taking current loss
-
-        # Store History of training
-        history = {
-            "Training Loss": [],
-            "Training Accuracy": [],
-            "Testing Accuracy": [],
-            "Test Loss": []
-        }
-
         # Training
         for epoch in range(self.epochs):
 
@@ -299,10 +298,10 @@ class NeuralNetworkFromScratch:
             val_loss = self.mse_loss(val_predictions, self.y_test)
 
             # Saving the data for plotting purpose
-            history["Training Loss"].append(loss)
-            history["Training Accuracy"].append(train_acc)
-            history["Testing Accuracy"].append(val_acc)
-            history["Test Loss"].append(val_loss)
+            self.history["Training Loss"].append(loss)
+            self.history["Training Accuracy"].append(train_acc)
+            self.history["Testing Accuracy"].append(val_acc)
+            self.history["Test Loss"].append(val_loss)
 
             print(
                 f"Epoch #{epoch+1} : val_loss={val_loss}, val_acc={val_acc}, training_loss={loss}, training_acc={train_acc}\n")
@@ -406,28 +405,48 @@ if __name__ == "__main__":
         dataset.columns[[-1]], axis=1)  # Remove last Column
     label = dataset[dataset.columns[-1]]  					# Extract Last Column
 
-    # Making a train_test_split
-    x_train, x_test, y_train, y_test = train_test_split(
-        features, label, test_size=0.4, random_state=42)
+    #--------------------- MODEL ----------------------------------#
 
-    # Creating the Model
-    model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
-                                     size_of_ip_layer=9,
-                                     size_of_hidden_layer=15,
-                                     size_of_op_layer=1,
-                                     ip_layer_activation="relu",
-                                     hidden_layer_activation="relu",
-                                     op_layer_activation="relu",
-                                     num_epoch=12000,
-                                     learning_rate=0.07,
-                                     type_of_initilization="Random"
-                                     )
+    Num_of_Folds = 10
 
-    # Initializing weights and biases
-    model.initialize_weights_and_biases()
+    # Get the current weights and biases for K-fold Approach
+    current_weights_and_biases = None
+    Fold_training_history = []
 
-    # Print the model summary
-    model.summary()
+    # Implementing K-fold approach
+    for fold in range(Num_of_Folds):
 
-    # Training the Model
-    model.fit()
+        print("<-------------------------------Beginning Fold Number : ", fold+1, "--------------------------------->\n")
+
+        # Making a train_test_split
+        x_train, x_test, y_train, y_test = train_test_split(
+            features, label, test_size=0.4, random_state=42)
+
+        # Initialize
+        model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
+                                         size_of_ip_layer=9,
+                                         size_of_hidden_layer=15,
+                                         size_of_op_layer=1,
+                                         ip_layer_activation="relu",
+                                         hidden_layer_activation="relu",
+                                         op_layer_activation="relu",
+                                         num_epoch=169,
+                                         learning_rate=0.07,
+                                         type_of_initilization="Random"
+                                         )
+
+        if(current_weights_and_biases == None):
+            model.initialize_weights_and_biases()
+        else:
+            # Load previously trained model
+            model.initialize_weights_and_biases(
+                model_weights_biases=current_weights_and_biases)
+
+        # Training
+        model.fit()
+
+        # Get the current weights and biases for K-fold Approach
+        current_weights_and_biases = model.get_current_model()
+
+        # Saving fold Specific History
+        Fold_training_history.append(model.get_history())
