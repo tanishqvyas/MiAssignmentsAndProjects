@@ -24,6 +24,7 @@ Activation Function in L2 :
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 
@@ -408,6 +409,7 @@ if __name__ == "__main__":
     #--------------------- MODEL ----------------------------------#
 
     Num_of_Folds = 10
+    model_learning_rate = 0.07
 
     # Get the current weights and biases for K-fold Approach
     current_weights_and_biases = None
@@ -416,7 +418,8 @@ if __name__ == "__main__":
     # Implementing K-fold approach
     for fold in range(Num_of_Folds):
 
-        print("<-------------------------------Beginning Fold Number : ", fold+1, "--------------------------------->\n")
+        print("<-------------------------------Beginning Fold Number : ",
+              fold+1, "--------------------------------->\n")
 
         # Making a train_test_split
         x_train, x_test, y_train, y_test = train_test_split(
@@ -431,7 +434,7 @@ if __name__ == "__main__":
                                          hidden_layer_activation="relu",
                                          op_layer_activation="relu",
                                          num_epoch=169,
-                                         learning_rate=0.07,
+                                         learning_rate=model_learning_rate,
                                          type_of_initilization="Random"
                                          )
 
@@ -450,3 +453,25 @@ if __name__ == "__main__":
 
         # Saving fold Specific History
         Fold_training_history.append(model.get_history())
+
+        # Reduce lr
+        model_learning_rate -= (0.069*model_learning_rate)
+
+    # summarize history for accuracy
+    # plt.plot(Fold_training_history[0]["Training Accuracy"])
+    # plt.plot(Fold_training_history[0]["Testing Accuracy"])
+    plt.plot(Fold_training_history[-1]["Training Loss"])
+    plt.plot(Fold_training_history[-1]["Test Loss"])
+    # plt.plot(history.history['lr'])
+
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+
+    # plt.legend(['train acc', 'val acc', 'train loss',
+    #             'val loss'], loc='upper right')
+
+    # plt.legend(['train acc', 'val acc'], loc='upper right')
+    plt.legend(['train loss', 'val loss'], loc='upper right')
+
+    plt.show()
