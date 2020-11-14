@@ -70,10 +70,11 @@ class NeuralNetworkFromScratch:
     # binary cost entropy cost
     def crossentropy_cost(self, AL, Y):
         # number of examples
-        m = Y.shape[1]
+        m = Y.shape[0]
         # Compute loss from AL and y.
         cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)
                                 * np.log(1-AL)) + self.epsilon
+
 
         # To make sure our cost's shape is what we expect
         cost = np.squeeze(cost)
@@ -82,7 +83,7 @@ class NeuralNetworkFromScratch:
 
     # Initialization
 
-    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Random"):
+    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Random", regularization=None):
         self.x_train = x_train.to_numpy()
         self.y_train = y_train.to_numpy()
         self.x_test = x_test.to_numpy()
@@ -104,6 +105,7 @@ class NeuralNetworkFromScratch:
 
         # Special varables
         self.epsilon = 1e-7
+        self.regularization = regularization
         self.history = {
             "Training Loss": [],
             "Training Accuracy": [],
@@ -274,7 +276,7 @@ class NeuralNetworkFromScratch:
             y_train_pred, params = self.forward_pass(self.x_train)
 
             # Compute Loss
-            loss = self.mse_loss(y_train_pred, self.y_train)
+            loss = self.crossentropy_cost(y_train_pred, self.y_train)
 
             # Back prop
             deravatives = self.backward_pass(params)
@@ -435,7 +437,8 @@ if __name__ == "__main__":
                                          op_layer_activation="relu",
                                          num_epoch=169,
                                          learning_rate=model_learning_rate,
-                                         type_of_initilization="Random"
+                                         type_of_initilization="Random",
+                                         regularization = "L2"
                                          )
 
         if(current_weights_and_biases == None):
@@ -460,8 +463,8 @@ if __name__ == "__main__":
     # summarize history for accuracy
     # plt.plot(Fold_training_history[0]["Training Accuracy"])
     # plt.plot(Fold_training_history[0]["Testing Accuracy"])
-    plt.plot(Fold_training_history[-1]["Training Loss"])
-    plt.plot(Fold_training_history[-1]["Test Loss"])
+    plt.plot(Fold_training_history[0]["Training Loss"])
+    plt.plot(Fold_training_history[0]["Test Loss"])
     # plt.plot(history.history['lr'])
 
     plt.title('model accuracy')
