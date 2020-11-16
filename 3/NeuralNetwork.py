@@ -350,6 +350,8 @@ class NeuralNetworkFromScratch:
                     self.saved_model = self.weights_and_biases
 
 
+
+
             # Update Paramaters
             self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - \
                 self.learning_rate*deravatives["dw2"]
@@ -502,8 +504,7 @@ if __name__ == "__main__":
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
                                          num_epoch=120,
-                                         learning_rate=model_learning_rate /
-                                         (1+fold),
+                                         learning_rate=model_learning_rate / (1+fold),
                                          type_of_initilization="Random",
                                          regularization="L2"
                                          )
@@ -528,7 +529,7 @@ if __name__ == "__main__":
         model_learning_rate -= (0.042*model_learning_rate)
 
     # summarize history for accuracy
-    plt.plot(Fold_training_history[-1]["Training Accuracy"])
+    plt.plot(Fold_training_history[0]["Training Accuracy"])
     # plt.plot(Fold_training_history[0]["Training Loss"])
 
     # plt.plot(history.history['lr'])
@@ -548,4 +549,4 @@ if __name__ == "__main__":
     # print(y_test_obs.shape)
     y_test = y_test.reshape((y_test.shape[0], 1))
     model.CM(y_test, y_test_obs)
-    print("Accuracy : ", model.get_accuracy(y_test_obs.T, y_test))
+    print("Testing Accuracy : ", model.get_accuracy(y_test_obs.T, y_test))
