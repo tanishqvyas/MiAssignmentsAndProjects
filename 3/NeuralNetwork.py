@@ -101,6 +101,7 @@ class NeuralNetworkFromScratch:
         self.epochs = num_epoch
         self.learning_rate = learning_rate
         self.weights_and_biases = {}
+        self.saved_model = {}
         self.type_of_initilization = type_of_initilization
 
         # Special varables
@@ -182,6 +183,7 @@ class NeuralNetworkFromScratch:
         # Loading a trained model
         else:
             self.weights_and_biases = model_weights_biases
+            self.saved_model = model_weights_biases
 
     # Function to print Model Summary
     def summary(self):
@@ -212,7 +214,7 @@ class NeuralNetworkFromScratch:
     # Function to return the current model
     def get_current_model(self):
         # Returning the weights and biases of the model
-        return self.weights_and_biases
+        return self.saved_model
 
     # function to return the training history
     def get_history(self):
@@ -281,16 +283,23 @@ class NeuralNetworkFromScratch:
 
     # Function to predict the labels
     def predict(self, X):
-        """
-        The predict function performs a simple feed forward of weights
-        and outputs yhat values
+        # Input layer
+        Z1 = np.dot(self.saved_model["w1"],
+                    X.T) + self.saved_model["b1"]
+        # print(self.weights_and_biases["w1"].shape)
+        # print(self.x_train.T.shape)
+        # print(self.weights_and_biases["b1"].shape)
+        A1 = self.tanh(Z1)
 
-        yhat is a list of the predicted value for df X
+        # Hidden Layer
+        Z2 = np.dot(self.saved_model["w2"],
+                    A1) + self.saved_model["b2"]
+        A2 = self.sigmoid(Z2)
 
-        """
-        yhat, _ = self.forward_pass(X)
+        # Output Layer
+        Y_pred = A2
 
-        return yhat
+        return Y_pred
 
     # Function to calculate the accuracy of the model on passed data
     def get_accuracy(self, pred, actual):
@@ -321,8 +330,19 @@ class NeuralNetworkFromScratch:
             # Compute Loss
             loss = self.crossentropy_cost(y_train_pred, self.y_train)
 
+            # Get training accuracy
+            train_acc = self.get_accuracy(y_train_pred, self.y_train)
+
             # Back prop
             deravatives = self.backward_pass(params)
+
+            # Saving the model
+            if(epoch > 0):
+                if(train_acc > self.history["Training Accuracy"][-1]):
+                    print("Accuracy improved from : ", self.history["Training Accuracy"][-1], " to : ", train_acc)
+                    print("Saving the model................................................................")
+                    self.saved_model = self.weights_and_biases
+
 
             # Update Paramaters
             self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - \
@@ -335,22 +355,14 @@ class NeuralNetworkFromScratch:
             self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - \
                 self.learning_rate*deravatives["db1"]
 
-            # Get training accuracy
-            train_acc = self.get_accuracy(y_train_pred, self.y_train)
-
-            # Calculate Validation Accuracy and Loss
-            val_predictions = self.predict(self.x_test)
-            val_acc = self.get_accuracy(val_predictions, self.y_test)
-            val_loss = self.mse_loss(val_predictions, self.y_test)
 
             # Saving the data for plotting purpose
             self.history["Training Loss"].append(loss)
             self.history["Training Accuracy"].append(train_acc)
-            self.history["Testing Accuracy"].append(val_acc)
-            self.history["Test Loss"].append(val_loss)
+
 
             print(
-                f"Epoch #{epoch+1} : val_loss={val_loss}, val_acc={val_acc}, training_loss={loss}, training_acc={train_acc}\n")
+                f"Epoch #{epoch+1} : training_loss={loss}, training_acc={train_acc}\n")
 
     def CM(self, y_test, y_test_obs):
         '''
@@ -510,26 +522,24 @@ if __name__ == "__main__":
 
     # summarize history for accuracy
     plt.plot(Fold_training_history[-1]["Training Accuracy"])
-    plt.plot(Fold_training_history[-1]["Testing Accuracy"])
     # plt.plot(Fold_training_history[0]["Training Loss"])
-    # plt.plot(Fold_training_history[0]["Test Loss"])
+
     # plt.plot(history.history['lr'])
 
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
 
-    # plt.legend(['train acc', 'val acc', 'train loss',
-    #             'val loss'], loc='upper right')
 
-    plt.legend(['train acc', 'val acc'], loc='upper right')
-    # plt.legend(['train loss', 'val loss'], loc='upper right')
+    plt.legend(['train acc'], loc='upper right')
+    # plt.legend(['train loss'], loc='upper right')
 
     plt.show()
 
-    y_test_obs, _ = model.forward_pass(x_test)
+    y_test_obs = model.predict(x_test)
     y_test_obs = y_test_obs.T
     y_test = y_test.to_numpy()
     # print(y_test_obs.shape)
     y_test = y_test.reshape((y_test.shape[0], 1))
     model.CM(y_test, y_test_obs)
+    print("Accuracy : ", model.get_accuracy(y_test_obs.T, y_test))
