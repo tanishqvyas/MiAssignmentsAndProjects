@@ -5,6 +5,12 @@ Design of a Neural Network from scratch
 Mention hyperparameters used and describe functionality in detail in this space
 - carries 1 mark
 
+Data Preprocessing
+The missing values in the 'Age', 'Weight', 'HB' and 'BP' columns were filled with the mean of the values in the respective columns.
+The missing values in the 'Delivery phase' was filled with the mode of the values in the column.
+The missing values in the 'Education' and 'Residence' columns were filled using the ffill method. 
+After executing all these, no missing values were remaining in the dataset.
+
 test_split_size : 0.3
 
 Number of Layers : 2
@@ -496,7 +502,8 @@ if __name__ == "__main__":
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
                                          num_epoch=120,
-                                         learning_rate=model_learning_rate,
+                                         learning_rate=model_learning_rate /
+                                         (1+fold),
                                          type_of_initilization="Random",
                                          regularization="L2"
                                          )
@@ -529,7 +536,6 @@ if __name__ == "__main__":
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-
 
     plt.legend(['train acc'], loc='upper right')
     # plt.legend(['train loss'], loc='upper right')
