@@ -5,22 +5,6 @@ Design of a Neural Network from scratch
 Mention hyperparameters used and describe functionality in detail in this space
 - carries 1 mark
 
-<<<<<<< HEAD
-test_split_size :
-
-Number of Layers :
-Number of Nodes in L1 :
-Number of Nodes in L2 :
-
-Number of Epochs :
-Learning Rate :
-Initialization of Weights and Biases :
-
-Activation Function in L1 :
-Activation Function in L2 :
-
-
-=======
 test_split_size : 0.3
 
 Number of Layers : 2
@@ -38,7 +22,6 @@ Optimization technique : RMS Prop
 Additional Things
 1. Dynamic learning rate
 2. K-fold Training
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
 
 '''
 import sys
@@ -51,10 +34,6 @@ from sklearn.model_selection import train_test_split
 class NeuralNetworkFromScratch:
 
     # Activation Functions
-<<<<<<< HEAD
-
-=======
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def sigmoid(self, X):
         z = 1/(1 + np.exp(-X))
         return z
@@ -80,10 +59,6 @@ class NeuralNetworkFromScratch:
 
     # End of activation Functions
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     # cost function
 
     # Mean squared error loss
@@ -108,10 +83,6 @@ class NeuralNetworkFromScratch:
         return cost
 
     # Initialization
-<<<<<<< HEAD
-
-=======
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Xavier", regularization=None):
         self.x_train = x_train.to_numpy()
         self.y_train = y_train.to_numpy()
@@ -143,10 +114,6 @@ class NeuralNetworkFromScratch:
         }
 
     # Function to initialize weights and biases
-<<<<<<< HEAD
-
-=======
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def initialize_weights_and_biases(self, model_weights_biases=None):
 
         # Initializing untrained model
@@ -216,10 +183,7 @@ class NeuralNetworkFromScratch:
         else:
             self.weights_and_biases = model_weights_biases
 
-<<<<<<< HEAD
-=======
     # Function to print Model Summary
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def summary(self):
 
         print("---------------Model Summary----------------")
@@ -246,27 +210,17 @@ class NeuralNetworkFromScratch:
         print("Activation for Output Layer : ", self.op_layer_activation)
 
     # Function to return the current model
-<<<<<<< HEAD
-
-=======
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def get_current_model(self):
         # Returning the weights and biases of the model
         return self.weights_and_biases
 
-<<<<<<< HEAD
-=======
     # function to return the training history
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def get_history(self):
 
         # Returning the history of the model
         return self.history
 
-<<<<<<< HEAD
-=======
     # Function to cpmpute the forward propagation
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def forward_pass(self, X):
 
         # Input layer
@@ -295,10 +249,7 @@ class NeuralNetworkFromScratch:
 
         return Y_pred, params
 
-<<<<<<< HEAD
-=======
     # Function to compute the backward_pass
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def backward_pass(self, params):
 
         dJ_by_dZ2 = params["A2"] - self.y_train
@@ -327,32 +278,8 @@ class NeuralNetworkFromScratch:
         }
 
         return deravatives
-<<<<<<< HEAD
-    
-        #update the weights and bias
-        self.params['W1'] = self.params['W1'] - self.learning_rate * dJ_by_dW1
-        self.params['W2'] = self.params['W2'] - self.learning_rate * dJ_by_dW2
-        self.params['b1'] = self.params['b1'] - self.learning_rate * dJ_by_db1
-        self.params['b2'] = self.params['b2'] - self.learning_rate * dJ_by_db2
-
-    
-        # calculate rmsprop for every layer
-        beta2 = 0.9
-        for i in range(2):
-             self.s[f'dW{i}'] = beta2 * self.s[f'dW{i}'] + (1 - beta2) * self.gradients[f'dW{i}']**2 
-             self.s[f'db{i}'] = beta2 * self.s[f'db{i}'] + (1 - beta2) * self.gradients[f'db{i}']**2
-               
-        # update parameters
-        for i in range(2):
-             self.weights[i] = self.weights[i] - self.learning_rate * self.gradients[f'dW{i}'] / (np.sqrt(self.s[f'dW{i}']) + epsilon)
-             self.biases[i] = self.biases[i] - self.learning_rate * self.gradients[f'db{i}'] / (np.sqrt(self.s[f'db{i}']) + epsilon)
-
-
-
-=======
 
     # Function to predict the labels
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def predict(self, X):
         """
         The predict function performs a simple feed forward of weights
@@ -365,10 +292,7 @@ class NeuralNetworkFromScratch:
 
         return yhat
 
-<<<<<<< HEAD
-=======
     # Function to calculate the accuracy of the model on passed data
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def get_accuracy(self, pred, actual):
 
         num_of_elements = pred.shape[1]
@@ -382,10 +306,7 @@ class NeuralNetworkFromScratch:
 
         return (correct / num_of_elements) * 100
 
-<<<<<<< HEAD
-=======
     # Function to carry out the model training
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     def fit(self):
         '''
         Function that trains the neural network by taking x_train and y_train samples as input
@@ -557,22 +478,13 @@ if __name__ == "__main__":
         # Initialize
         model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
                                          size_of_ip_layer=9,
-<<<<<<< HEAD
-                                         size_of_hidden_layer=17,
-=======
                                          size_of_hidden_layer=15,
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
                                          size_of_op_layer=1,
                                          ip_layer_activation="tanh",
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
                                          num_epoch=120,
-<<<<<<< HEAD
-                                         learning_rate=model_learning_rate /
-                                         (1+fold),
-=======
                                          learning_rate=model_learning_rate,
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
                                          type_of_initilization="Random",
                                          regularization="L2"
                                          )
@@ -606,7 +518,6 @@ if __name__ == "__main__":
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-<<<<<<< HEAD
 
     # plt.legend(['train acc', 'val acc', 'train loss',
     #             'val loss'], loc='upper right')
@@ -616,25 +527,9 @@ if __name__ == "__main__":
 
     plt.show()
 
-=======
-
-    # plt.legend(['train acc', 'val acc', 'train loss',
-    #             'val loss'], loc='upper right')
-
-    plt.legend(['train acc', 'val acc'], loc='upper right')
-    # plt.legend(['train loss', 'val loss'], loc='upper right')
-
-    plt.show()
-
-    # Computing the Confusion matrix, F1-Score, Precision and Recall
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
     y_test_obs, _ = model.forward_pass(x_test)
     y_test_obs = y_test_obs.T
     y_test = y_test.to_numpy()
     # print(y_test_obs.shape)
     y_test = y_test.reshape((y_test.shape[0], 1))
-<<<<<<< HEAD
     model.CM(y_test, y_test_obs)
-=======
-    model.CM(y_test, y_test_obs)
->>>>>>> a78986aff1c296b6e9b1f7e6845fc259e5806938
