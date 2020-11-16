@@ -75,7 +75,6 @@ class NeuralNetworkFromScratch:
         cost = (-1./m) * np.sum(Y*np.log(AL)+(1-Y)
                                 * np.log(1-AL)) + self.epsilon
 
-
         # To make sure our cost's shape is what we expect
         cost = np.squeeze(cost)
 
@@ -83,7 +82,7 @@ class NeuralNetworkFromScratch:
 
     # Initialization
 
-    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Random", regularization=None):
+    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Xavier", regularization=None):
         self.x_train = x_train.to_numpy()
         self.y_train = y_train.to_numpy()
         self.x_test = x_test.to_numpy()
@@ -120,27 +119,65 @@ class NeuralNetworkFromScratch:
         # Initializing untrained model
         if(model_weights_biases == None):
 
-            # Layer 1
-            W1 = np.random.randn(self.size_of_hidden_layer,
-                                 self.size_of_ip_layer) * 0.01
-
-            b1 = np.zeros((self.size_of_hidden_layer, 1))
-
-            # Layer 2
             if(self.type_of_initilization == "Random"):
+
+                W1 = np.random.randn(self.size_of_hidden_layer,
+                                     self.size_of_ip_layer) * 0.01
+
                 W2 = np.random.randn(self.size_of_op_layer,
                                      self.size_of_hidden_layer) * 0.01
 
-            b2 = np.zeros((self.size_of_op_layer, 1))
+                b1 = np.zeros((self.size_of_hidden_layer, 1))
+                b2 = np.zeros((self.size_of_op_layer, 1))
 
-            weights_and_biases = {
-                "w1": W1,
-                "b1": b1,
-                "w2": W2,
-                "b2": b2
-            }
+                weights_and_biases = {
+                    "w1": W1,
+                    "b1": b1,
+                    "w2": W2,
+                    "b2": b2
+                }
 
-            self.weights_and_biases = weights_and_biases
+                self.weights_and_biases = weights_and_biases
+
+            elif(self.type_of_initilization == "Xavier"):
+
+                W1 = np.random.randn(self.size_of_hidden_layer,
+                                     self.size_of_ip_layer)*np.sqrt(1/self.size_of_ip_layer)
+
+                W2 = np.random.randn(self.size_of_op_layer,
+                                     self.size_of_hidden_layer)*np.sqrt(1/self.size_of_hidden_layer)
+
+                b1 = np.zeros((self.size_of_hidden_layer, 1))
+                b2 = np.zeros((self.size_of_op_layer, 1))
+
+                weights_and_biases = {
+                    "w1": W1,
+                    "b1": b1,
+                    "w2": W2,
+                    "b2": b2
+                }
+
+                self.weights_and_biases = weights_and_biases
+
+            elif(self.type_of_initilization == "Henormal"):
+
+                W1 = np.random.randn(self.size_of_hidden_layer,
+                                     self.size_of_ip_layer)*np.sqrt(2/(self.size_of_ip_layer+self.size_of_hidden_layer))
+
+                W2 = np.random.randn(self.size_of_op_layer,
+                                     self.size_of_hidden_layer)*np.sqrt(2/(self.size_of_hidden_layer+self.size_of_op_layer))
+
+                b1 = np.zeros((self.size_of_hidden_layer, 1))
+                b2 = np.zeros((self.size_of_op_layer, 1))
+
+                weights_and_biases = {
+                    "w1": W1,
+                    "b1": b1,
+                    "w2": W2,
+                    "b2": b2
+                }
+
+                self.weights_and_biases = weights_and_biases
 
         # Loading a trained model
         else:
@@ -410,8 +447,8 @@ if __name__ == "__main__":
 
     #--------------------- MODEL ----------------------------------#
 
-    Num_of_Folds = 2
-    model_learning_rate = 0.07
+    Num_of_Folds = 3
+    model_learning_rate = 0.05
 
     # Get the current weights and biases for K-fold Approach
     current_weights_and_biases = None
@@ -425,21 +462,20 @@ if __name__ == "__main__":
 
         # Making a train_test_split
         x_train, x_test, y_train, y_test = train_test_split(
-            features, label, test_size=0.4, random_state=42)
-        
+            features, label, test_size=0.3, random_state=42)
 
         # Initialize
         model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
                                          size_of_ip_layer=9,
-                                         size_of_hidden_layer=15,
+                                         size_of_hidden_layer=17,
                                          size_of_op_layer=1,
-                                         ip_layer_activation="relu",
-                                         hidden_layer_activation="relu",
-                                         op_layer_activation="relu",
+                                         ip_layer_activation="tanh",
+                                         hidden_layer_activation="sigmoid",
+                                         op_layer_activation="sigmoid",
                                          num_epoch=120,
                                          learning_rate=model_learning_rate,
                                          type_of_initilization="Random",
-                                         regularization = "L2"
+                                         regularization="L2"
                                          )
 
         if(current_weights_and_biases == None):
@@ -462,10 +498,10 @@ if __name__ == "__main__":
         model_learning_rate -= (0.042*model_learning_rate)
 
     # summarize history for accuracy
-    # plt.plot(Fold_training_history[0]["Training Accuracy"])
-    # plt.plot(Fold_training_history[0]["Testing Accuracy"])
-    plt.plot(Fold_training_history[0]["Training Loss"])
-    plt.plot(Fold_training_history[0]["Test Loss"])
+    plt.plot(Fold_training_history[0]["Training Accuracy"])
+    plt.plot(Fold_training_history[0]["Testing Accuracy"])
+    # plt.plot(Fold_training_history[0]["Training Loss"])
+    # plt.plot(Fold_training_history[0]["Test Loss"])
     # plt.plot(history.history['lr'])
 
     plt.title('model accuracy')
@@ -475,7 +511,7 @@ if __name__ == "__main__":
     # plt.legend(['train acc', 'val acc', 'train loss',
     #             'val loss'], loc='upper right')
 
-    # plt.legend(['train acc', 'val acc'], loc='upper right')
-    plt.legend(['train loss', 'val loss'], loc='upper right')
+    plt.legend(['train acc', 'val acc'], loc='upper right')
+    # plt.legend(['train loss', 'val loss'], loc='upper right')
 
     plt.show()
