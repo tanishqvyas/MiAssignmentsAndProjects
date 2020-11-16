@@ -410,7 +410,7 @@ if __name__ == "__main__":
 
     #--------------------- MODEL ----------------------------------#
 
-    Num_of_Folds = 10
+    Num_of_Folds = 2
     model_learning_rate = 0.07
 
     # Get the current weights and biases for K-fold Approach
@@ -426,6 +426,7 @@ if __name__ == "__main__":
         # Making a train_test_split
         x_train, x_test, y_train, y_test = train_test_split(
             features, label, test_size=0.4, random_state=42)
+        
 
         # Initialize
         model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
@@ -435,7 +436,7 @@ if __name__ == "__main__":
                                          ip_layer_activation="relu",
                                          hidden_layer_activation="relu",
                                          op_layer_activation="relu",
-                                         num_epoch=169,
+                                         num_epoch=120,
                                          learning_rate=model_learning_rate,
                                          type_of_initilization="Random",
                                          regularization = "L2"
@@ -458,7 +459,7 @@ if __name__ == "__main__":
         Fold_training_history.append(model.get_history())
 
         # Reduce lr
-        model_learning_rate -= (0.069*model_learning_rate)
+        model_learning_rate -= (0.042*model_learning_rate)
 
     # summarize history for accuracy
     # plt.plot(Fold_training_history[0]["Training Accuracy"])
