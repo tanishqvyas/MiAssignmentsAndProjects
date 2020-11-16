@@ -346,7 +346,7 @@ class NeuralNetworkFromScratch:
             print(
                 f"Epoch #{epoch+1} : val_loss={val_loss}, val_acc={val_acc}, training_loss={loss}, training_acc={train_acc}\n")
 
-    def CM(y_test, y_test_obs):
+    def CM(self, y_test, y_test_obs):
         '''
         Prints confusion matrix 
         y_test is list of y values in the test dataset
@@ -452,6 +452,11 @@ if __name__ == "__main__":
 
     # Get the current weights and biases for K-fold Approach
     current_weights_and_biases = None
+    model = None
+    x_train = None
+    y_train = None
+    x_test = None
+    y_test = None
     Fold_training_history = []
 
     # Implementing K-fold approach
@@ -473,7 +478,8 @@ if __name__ == "__main__":
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
                                          num_epoch=120,
-                                         learning_rate=model_learning_rate,
+                                         learning_rate=model_learning_rate /
+                                         (1+fold),
                                          type_of_initilization="Random",
                                          regularization="L2"
                                          )
@@ -498,8 +504,8 @@ if __name__ == "__main__":
         model_learning_rate -= (0.042*model_learning_rate)
 
     # summarize history for accuracy
-    plt.plot(Fold_training_history[0]["Training Accuracy"])
-    plt.plot(Fold_training_history[0]["Testing Accuracy"])
+    plt.plot(Fold_training_history[-1]["Training Accuracy"])
+    plt.plot(Fold_training_history[-1]["Testing Accuracy"])
     # plt.plot(Fold_training_history[0]["Training Loss"])
     # plt.plot(Fold_training_history[0]["Test Loss"])
     # plt.plot(history.history['lr'])
@@ -515,3 +521,10 @@ if __name__ == "__main__":
     # plt.legend(['train loss', 'val loss'], loc='upper right')
 
     plt.show()
+
+    y_test_obs, _ = model.forward_pass(x_test)
+    y_test_obs = y_test_obs.T
+    y_test = y_test.to_numpy()
+    # print(y_test_obs.shape)
+    y_test = y_test.reshape((y_test.shape[0], 1))
+    model.CM(y_test, y_test_obs)
