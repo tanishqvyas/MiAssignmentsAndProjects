@@ -506,7 +506,7 @@ if __name__ == "__main__":
     #--------------------- MODEL ----------------------------------#
 
     Num_of_Folds = 3
-    model_learning_rate = 0.069
+    model_learning_rate = 0.07
 
     # Get the current weights and biases for K-fold Approach
     current_weights_and_biases = None
@@ -558,13 +558,12 @@ if __name__ == "__main__":
         Fold_training_history.append(model.get_history())
 
         # Reduce lr
-        model_learning_rate -= (0.042*model_learning_rate)
+        model_learning_rate *= 0.1
 
     # summarize history for accuracy
     plt.plot(Fold_training_history[0]["Training Accuracy"])
     # plt.plot(Fold_training_history[0]["Training Loss"])
 
-    # plt.plot(history.history['lr'])
 
     plt.title('model accuracy')
     plt.ylabel('accuracy')
@@ -573,7 +572,7 @@ if __name__ == "__main__":
     plt.legend(['train acc'], loc='upper right')
     # plt.legend(['train loss'], loc='upper right')
 
-    plt.show()
+    # plt.show()
 
     y_test_obs = model.predict(x_test)
     y_test_obs = y_test_obs.T
