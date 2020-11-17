@@ -492,7 +492,7 @@ if __name__ == "__main__":
                                          ip_layer_activation="tanh",
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
-                                         num_epoch=140,
+                                         num_epoch=24,
                                          learning_rate=model_learning_rate / (1+fold*7),
                                          type_of_initilization="Random",
                                          optimizer = "none"
