@@ -17,7 +17,7 @@ Number of Layers : 2
 Number of Nodes in L1 : 9
 Number of Nodes in L2 : 15
 
-Number of Epochs : 120
+Number of Epochs : 140
 Learning Rate : initialised with 0.07
 Initialization of Weights and Biases : Henormal, Xavier, Random
 
@@ -453,50 +453,7 @@ class NeuralNetworkFromScratch:
 if __name__ == "__main__":
 
     # Reading in the Data Set
-    dataset = pd.read_csv("LBW_Dataset.csv")
-    print(dataset.head())
-
-    # <-------------- Pre processing of DataFrame--------------------->
-
-    dataset.describe()
-
-    # sum of all null values in dataset per column
-    print(dataset.isnull().sum())
-
-    print(dataset["Age"].mean())  # mean of Age
-
-    # replacing all missing values with mean of Age
-    dataset['Age'].fillna(value=dataset['Age'].mean(), inplace=True)
-
-    print(dataset["Weight"].mean())  # mean of Weight
-
-    # replacing all missing values with mean of Weight
-    dataset['Weight'].fillna(value=dataset['Weight'].mean(), inplace=True)
-
-    # replacing all missing values with mode of Delivery phase
-    dataset['Delivery phase'].fillna(
-        dataset['Delivery phase'].mode()[0], inplace=True)
-
-    print(dataset["HB"].mean())  # mean of HB
-
-    # replacing all missing values with mean of HB
-    dataset['HB'].fillna(value=dataset['HB'].mean(), inplace=True)
-
-    print(dataset["BP"].mean())  # mean of BP
-
-    # replacing all missing values with mean of BP
-    dataset['BP'].fillna(value=dataset['BP'].mean(), inplace=True)
-
-    # using the ffill method to fill in the missing values in Education
-    dataset["Education"].fillna(method='ffill', inplace=True)
-
-    # using the ffill method to fill in the missing values in Residence
-    dataset["Residence"].fillna(method='ffill', inplace=True)
-
-    # no null values remaining in dataset, it has been cleaned
-    print(dataset.isnull().sum())
-
-    print(dataset)
+    dataset = pd.read_csv("Cleaned_LBW_Dataset.csv")
 
     # Extracting Features and Labels
     features = dataset.drop(
@@ -529,7 +486,7 @@ if __name__ == "__main__":
 
         # Initialize
         model = NeuralNetworkFromScratch(x_train, y_train, x_test, y_test,
-                                         size_of_ip_layer=9,
+                                         size_of_ip_layer=10,
                                          size_of_hidden_layer=15,
                                          size_of_op_layer=1,
                                          ip_layer_activation="tanh",
