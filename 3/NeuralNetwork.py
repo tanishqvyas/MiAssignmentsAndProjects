@@ -89,7 +89,7 @@ class NeuralNetworkFromScratch:
         return cost
 
     # Initialization
-    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Xavier", regularization=None):
+    def __init__(self, x_train, y_train, x_test, y_test, size_of_ip_layer, size_of_hidden_layer, size_of_op_layer, ip_layer_activation, hidden_layer_activation, op_layer_activation, num_epoch, learning_rate, type_of_initilization="Xavier", optimizer="none"):
         self.x_train = x_train.to_numpy()
         self.y_train = y_train.to_numpy()
         self.x_test = x_test.to_numpy()
@@ -111,8 +111,8 @@ class NeuralNetworkFromScratch:
         self.type_of_initilization = type_of_initilization
 
         # Special varables
+        self.optimizer = optimizer
         self.epsilon = 1e-7
-        self.regularization = regularization
         self.history = {
             "Training Loss": [],
             "Training Accuracy": [],
@@ -326,6 +326,13 @@ class NeuralNetworkFromScratch:
         '''
         Function that trains the neural network by taking x_train and y_train samples as input
         '''
+        decay_rate = 0.9
+        comparative_acc = 0
+        reg = 0.01
+        cache_w2 = 0
+        cache_w1 = 0
+        cache_b1 = 0
+        cache_b2 = 0
 
         # Training
         for epoch in range(self.epochs):
@@ -343,25 +350,50 @@ class NeuralNetworkFromScratch:
             deravatives = self.backward_pass(params)
 
             # Saving the model
+            if(epoch == 0):
+                comparative_acc = train_acc
             if(epoch > 0):
-                if(train_acc > self.history["Training Accuracy"][-1]):
-                    print("Accuracy improved from : ", self.history["Training Accuracy"][-1], " to : ", train_acc)
+                if(train_acc > comparative_acc):
+                    print("Accuracy improved from : ", comparative_acc, " to : ", train_acc)
                     print("Saving the model................................................................")
                     self.saved_model = self.weights_and_biases
+                    comparative_acc = train_acc
 
+            # RMS Prop and Updating Parameters
+            if(self.optimizer == "rmsprop"):
+                
+                # Updating W2
+                gw2 = deravatives["dw2"] + reg * self.weights_and_biases["w2"]
+                cache_w2 = decay_rate * cache_w2 + (1-decay_rate) * gw2 * gw2
+                self.weights_and_biases["w2"] -= (self.learning_rate * gw2) / (np.sqrt(cache_w2) + self.epsilon)
 
+                # Updating b2
+                gb2 = deravatives["db2"] + reg * self.weights_and_biases["b2"]
+                cache_b2 = decay_rate * cache_b2 + (1-decay_rate) * gb2 * gb2
+                self.weights_and_biases["b2"] -= (self.learning_rate * gb2) / (np.sqrt(cache_b2) + self.epsilon)
 
+                # Updating W1
+                gw1 = deravatives["dw1"] + reg * self.weights_and_biases["w1"]
+                cache_w1 = decay_rate * cache_w1 + (1-decay_rate) * gw1 * gw1
+                self.weights_and_biases["w1"] -= (self.learning_rate * gw1) / (np.sqrt(cache_w1) + self.epsilon)
+
+                # Updating b1
+                gb1 = deravatives["db1"] + reg * self.weights_and_biases["b1"]
+                cache_b1 = decay_rate * cache_b1 + (1-decay_rate) * gb1 * gb1
+                self.weights_and_biases["b1"] -= (self.learning_rate * gb1) / (np.sqrt(cache_b1) + self.epsilon)
 
             # Update Paramaters
-            self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - \
-                self.learning_rate*deravatives["dw2"]
-            self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - \
-                self.learning_rate*deravatives["db2"]
+            if(self.optimizer == "none"):
+                    
+                self.weights_and_biases["w2"] = self.weights_and_biases["w2"] - \
+                    self.learning_rate*deravatives["dw2"]
+                self.weights_and_biases["b2"] = self.weights_and_biases["b2"] - \
+                    self.learning_rate*deravatives["db2"]
 
-            self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - \
-                self.learning_rate*deravatives["dw1"]
-            self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - \
-                self.learning_rate*deravatives["db1"]
+                self.weights_and_biases["w1"] = self.weights_and_biases["w1"] - \
+                    self.learning_rate*deravatives["dw1"]
+                self.weights_and_biases["b1"] = self.weights_and_biases["b1"] - \
+                    self.learning_rate*deravatives["db1"]
 
 
             # Saving the data for plotting purpose
@@ -474,7 +506,7 @@ if __name__ == "__main__":
     #--------------------- MODEL ----------------------------------#
 
     Num_of_Folds = 3
-    model_learning_rate = 0.05
+    model_learning_rate = 0.069
 
     # Get the current weights and biases for K-fold Approach
     current_weights_and_biases = None
@@ -503,11 +535,11 @@ if __name__ == "__main__":
                                          ip_layer_activation="tanh",
                                          hidden_layer_activation="sigmoid",
                                          op_layer_activation="sigmoid",
-                                         num_epoch=120,
-                                         learning_rate=model_learning_rate / (1+fold),
+                                         num_epoch=140,
+                                         learning_rate=model_learning_rate / (1+fold*7),
                                          type_of_initilization="Random",
-                                         regularization="L2"
-                                         )
+                                         optimizer = "none"
+                                        )
 
         if(current_weights_and_biases == None):
             model.initialize_weights_and_biases()
